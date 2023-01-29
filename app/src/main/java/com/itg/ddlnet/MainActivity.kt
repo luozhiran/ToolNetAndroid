@@ -16,7 +16,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.send).setOnClickListener {
-            DdNet.instance.builder(DdNet.GET).send(object :DdCallback{
+            DdNet.instance.get().send(object :DdCallback{
                 override fun onFailure(er: String?) {
 
                 }
