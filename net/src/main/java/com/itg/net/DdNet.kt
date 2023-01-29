@@ -41,7 +41,7 @@ class DdNet {
     val callbackMgr: CallbackMgr by lazy { CallbackMgr() }
 
 
-    private fun builder(type: Int): Builder {
+    fun builder(type: Int): Builder {
         return create(type) ?: throw Exception("dot support $type")
     }
 
