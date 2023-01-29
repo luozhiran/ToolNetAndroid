@@ -1,8 +1,7 @@
 plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
-    id 'cn.me.android.plugin.upload'
-
+    id 'maven-publish'
 }
 
 android {
@@ -42,4 +41,54 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.9.2'
     implementation 'com.orhanobut:logger:2.2.0'
 
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                // You can then customize attributes of the publication as shown below.
+                artifactId = POM_ARTIFACT_ID
+                groupId = GROUP
+                version = VERSION_NAME
+            }
+
+            debug(MavenPublication) {
+                artifactId = POM_ARTIFACT_ID
+                groupId = GROUP
+                version = VERSION_NAME
+            }
+
+        }
+
+//        repositories {
+//            maven {
+//                name = "npm"
+//                url = AAR_OUTPUT_URL
+//            }
+//        }
+
+        repositories {
+            maven {
+                url = getRepositoryUrl()
+                credentials {
+                    username 'deployment'
+                    password 'deployment123'
+                }
+            }
+        }
+    }
+}
+
+//增加自定义代码
+def getRepositoryUrl() {
+    if (isReleaseBuild()){
+        return "https://nexus.ddxq.mobi/repository/maven-releases/"
+    } else {
+        return "https://nexus.ddxq.mobi/repository/maven-snapshots/"
+    }
+}
+
+def isReleaseBuild(){
+    return !VERSION_NAME.contains("SNAPSHOT")
 }
