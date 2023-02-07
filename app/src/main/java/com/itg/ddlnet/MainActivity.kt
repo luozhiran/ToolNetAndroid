@@ -17,7 +17,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        findViewById<Button>(R.id.send).setOnClickListener {
+        findViewById<Button>(R.id.download).setOnClickListener {
             DdNet.instance.download
                 .downloadTask()
                 .path("${filesDir}/a.png")
@@ -38,6 +38,22 @@ class MainActivity : AppCompatActivity() {
 
                 })
                 .start()
+        }
+
+        findViewById<Button>(R.id.get).setOnClickListener {
+            DdNet.instance.get()
+                .url("https://www.baidu.com")
+                .send(object :DdCallback{
+                    override fun onFailure(er: String?) {
+
+                    }
+
+                    override fun onResponse(result: String?, code: Int) {
+
+                    }
+
+                })
+
         }
 
     }
