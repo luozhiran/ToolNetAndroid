@@ -58,6 +58,11 @@ class MainActivity : AppCompatActivity() {
 
         }
 
+        findViewById<Button>(R.id.post).setOnClickListener {
+            DdNet.instance.post()
+
+        }
+
     }
 
 

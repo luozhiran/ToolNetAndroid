@@ -6,15 +6,17 @@ import okhttp3.Call
 import okhttp3.Request
 
 class Post : AdapterBuilder() {
+    private val urlParams= StringBuilder()
 
     fun appendUrl(key: String?, value: String?): Post {
-        params.append(key).append("#").append(value).append("$")
+        urlParams.append(key).append("#").append(value).append("$")
         return this
     }
 
     override fun createCall(): Call? {
         val builder = Request.Builder()
         getHeader()?.apply { builder.headers(this) }
+        val url = getParam()
         if (tag.isNullOrEmpty()) {
             builder.tag(url)
         } else {

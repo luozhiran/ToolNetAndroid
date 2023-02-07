@@ -20,7 +20,7 @@ abstract class AdapterBuilder : Builder {
 
     var url: String? = DdNet.instance.ddNetConfig.url
     private val headerSb = StringBuilder()
-    protected val params = StringBuilder()
+    private val params = StringBuilder()
 
     var files: MutableList<File?>? = null
     var fileNames: MutableList<String?>? = null
@@ -44,8 +44,8 @@ abstract class AdapterBuilder : Builder {
 
     override fun addParam(map: MutableMap<String, String?>?): Builder {
         if (map.isNullOrEmpty()) return this
-        map.forEach{entry->
-            addParam(entry.key,entry.value)
+        map.forEach { entry ->
+            addParam(entry.key, entry.value)
         }
         return this
     }
@@ -58,8 +58,8 @@ abstract class AdapterBuilder : Builder {
 
     override fun addHeader(map: MutableMap<String, String?>?): Builder {
         if (map.isNullOrEmpty()) return this
-        map.forEach{entry->
-            addHeader(entry.key,entry.value)
+        map.forEach { entry ->
+            addHeader(entry.key, entry.value)
         }
         return this
     }
@@ -188,8 +188,9 @@ abstract class AdapterBuilder : Builder {
         }
     }
 
-    fun getParam(): String {
-        val urlParam = mergeParam(params) ?: return this.url ?: ""
+    fun getParam(urlParams: StringBuilder?=null): String {
+
+        val urlParam = mergeParam(urlParams?:params) ?: return this.url ?: ""
         if (urlParam.isNotBlank()) {
             val urlBuild = Uri.parse(this.url).buildUpon()
             val keyValue = urlParam.toString().split("[$]")
