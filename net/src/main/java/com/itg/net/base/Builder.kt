@@ -7,6 +7,7 @@ import okhttp3.Cookie
 import java.io.File
 
 interface Builder {
+    fun addParam(map:MutableMap<String,String?>?): Builder
     fun addParam(key: String?, value: String?): Builder
     fun addHeader(key: String?, value: String?): Builder
     fun url(url: String?): Builder

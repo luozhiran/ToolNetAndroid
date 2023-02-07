@@ -17,16 +17,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.send).setOnClickListener {
 
-            DdNet.instance.get().send(object :DdCallback{
-                override fun onFailure(er: String?) {
-
-                }
-
-                override fun onResponse(result: String?, code: Int) {
-
-                }
-
-            })
+            DdNet.instance.builder(DdNet.GET)
         }
 
     }

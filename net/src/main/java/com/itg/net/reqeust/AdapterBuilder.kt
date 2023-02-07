@@ -36,6 +36,13 @@ abstract class AdapterBuilder : Builder {
     var cookies: String? = null
     var tag: String? = null
 
+    override fun addParam(map: MutableMap<String, String?>?): Builder {
+        if (map.isNullOrEmpty()) return this
+        map.forEach{entry->
+            addParam(entry.key,entry.value)
+        }
+        return this
+    }
 
     override fun addParam(key: String?, value: String?): Builder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
