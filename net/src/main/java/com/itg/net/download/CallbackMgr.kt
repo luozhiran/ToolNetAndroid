@@ -8,6 +8,7 @@ class CallbackMgr {
     private val progressCallbackList : MutableList<IProgressCallback> by lazy { mutableListOf() }
 
     fun addProgressCallbackToMap(url:String,progressCallback:IProgressCallback){
+        removeProgressBackForMap(url)
         progressCallbackMap[url] = progressCallback
     }
 
@@ -55,4 +56,5 @@ class CallbackMgr {
             it.onFail(msg,url)
         }
     }
+
 }

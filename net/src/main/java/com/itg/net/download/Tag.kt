@@ -6,4 +6,4 @@ const val DOWNLOAD_TASK = 2
 
 
 const val DOWNLOAD_FILE = 1
-const val DOWNLOAD_SUCCESS = 1
+const val DOWNLOAD_SUCCESS = 2

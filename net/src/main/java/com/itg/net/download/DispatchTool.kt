@@ -207,7 +207,7 @@ class DispatchTool : Dispatch {
         task: DTask,
         callback: (type: Int, tag: String) -> Unit
     ) {
-        val file = File(task.path(), ".tmp")
+        val file = File(task.path()+".tmp" )
         if (task.append()) {
             task.setContentLength(response.body?.contentLength() ?: 0 + file.length())
         } else {
@@ -281,18 +281,32 @@ class DispatchTool : Dispatch {
 
     fun cancelTask(url:String?){
         synchronized(this){
-            mRunningTasks.forEach {
-                if (it.url().equals(url)) {
-                    it.cancel(url)
-                }
-            }
-
             mTaskQueue.forEach {
                 if (it.url().equals(url)) {
                     it.cancel(url)
                 }
             }
+            mRunningTasks.forEach {
+                if (it.url().equals(url)) {
+                    it.cancel(url)
+                }
+            }
         }
+    }
+
+    fun getTask(url:String?):Task?{
+        mTaskQueue.forEach {
+            if (it.url().equals(url)) {
+                return it
+            }
+        }
+
+        mRunningTasks.forEach {
+            if (it.url().equals(url)) {
+                return it
+            }
+        }
+        return null
     }
 
     fun isQueue(url:String?):Boolean{

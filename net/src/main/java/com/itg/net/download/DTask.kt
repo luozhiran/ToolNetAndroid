@@ -3,7 +3,7 @@ package com.itg.net.download
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.Task
 
-class DTask : Task {
+abstract class DTask : Task {
 
     var param: HashMap<String, String>? = null
     private var tUrl: String? = null
@@ -56,9 +56,9 @@ class DTask : Task {
     fun cancel() = rCancelUrl
 
 
-    fun url(url: String?): Task {
+    fun url(url: String?): BusinessTask {
         tUrl = url
-        return this
+        return this as BusinessTask
     }
 
 
@@ -76,9 +76,9 @@ class DTask : Task {
 
     override fun broadcastComponentName() = tComponentName
 
-    fun path(path: String): Task {
+    fun path(path: String): BusinessTask {
         tPath = path
-        return this
+        return this as BusinessTask
     }
 
     override fun path() = tPath
@@ -86,9 +86,9 @@ class DTask : Task {
 
     override fun md5() = tMd5
 
-    fun md5(md5: String): Task {
+    fun md5(md5: String): BusinessTask {
         tMd5 = md5
-        return this
+        return this as BusinessTask
     }
 
     fun customBroadcast(action: String) {
@@ -106,8 +106,8 @@ class DTask : Task {
     fun progressCallback() = iProgressCallback
 
 
-    fun progressBack(callback: IProgressCallback?): Task? {
+    fun progressBack(callback: IProgressCallback?): BusinessTask? {
         iProgressCallback = callback
-        return this
+        return this as? BusinessTask
     }
 }
