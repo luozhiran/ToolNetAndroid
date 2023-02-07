@@ -298,6 +298,7 @@ class DispatchTool : Dispatch {
         }
         if (needDeleteTask != null) {
             mTaskQueue.remove(needDeleteTask)
+            mTaskQueueUrl.remove(needDeleteTask!!.url())
             return
         }
         mRunningTasks.forEach {
@@ -308,6 +309,15 @@ class DispatchTool : Dispatch {
             }
         }
         mRunningTasks.remove(needDeleteTask)
+        mRunningTasksUrl.remove(needDeleteTask!!.url())
+    }
+
+    fun cancelTask(task:Task?){
+        if (task == null)return
+        mTaskQueue.remove(task)
+        mTaskQueueUrl.remove(task.url())
+        mRunningTasks.remove(task)
+        mRunningTasksUrl.remove(task.url())
     }
 
     fun getTask(url: String?): Task? {

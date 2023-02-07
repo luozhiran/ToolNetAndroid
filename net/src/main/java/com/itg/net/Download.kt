@@ -26,8 +26,12 @@ class Download {
         return dispatchTool.isQueue(url)
     }
 
-    fun cancel(url: String) {
+    fun cancel(url: String?) {
         dispatchTool.cancelTask(url)
+    }
+
+    fun cancel(task: Task?) {
+        dispatchTool.cancelTask(task)
     }
 
     fun getTask(url: String): Task? {

@@ -13,12 +13,14 @@ import com.itg.net.reqeust.model.Post
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
+    var task:Task?=null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         findViewById<Button>(R.id.download).setOnClickListener {
-            DdNet.instance.download
+            DdNet.instance.download.cancel(task)
+            task = DdNet.instance.download
                 .downloadTask()
                 .path("${filesDir}/a.png")
                 .url("https://img.ddimg.mobi/eec4b4388b26f1600152066290.png")
@@ -61,5 +63,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
+        DdNet.instance.download.cancel(task)
     }
 }
