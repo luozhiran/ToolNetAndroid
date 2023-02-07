@@ -60,6 +60,17 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.post).setOnClickListener {
             DdNet.instance.post()
+                .url("")
+                .send(object :DdCallback{
+                    override fun onFailure(er: String?) {
+
+                    }
+
+                    override fun onResponse(result: String?, code: Int) {
+
+                    }
+
+                })
 
         }
 
