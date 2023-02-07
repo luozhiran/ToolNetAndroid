@@ -8,7 +8,6 @@ import com.itg.net.base.Builder
 import com.itg.net.base.DdCallback
 import com.itg.net.reqeust.body.IntervalBody
 import com.itg.net.reqeust.body.IntervalBodyBuilder
-import com.itg.net.reqeust.model.Post
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -276,14 +275,14 @@ abstract class AdapterBuilder : Builder {
     private fun getMultipartBody(formParams: StringBuilder?): MultipartBody {
         val builder = MultipartBody.Builder()
         builder.setType(MultipartBody.FORM)
-        var hasVaule = false
+        var hasValue = false
         if (formParams != null && formParams.isNotBlank()) {
             val keyValue = formParams.toString().split("[$]")
             keyValue.forEach {
                 val s = it.split("#")
                 if (s.isNotEmpty() && s.size == 2) {
                     builder.addFormDataPart(s[0], s[1])
-                    hasVaule = true
+                    hasValue = true
                 }
 
             }
@@ -295,7 +294,7 @@ abstract class AdapterBuilder : Builder {
             contentNames?.get(index)?.let {
                 if (body != null) {
                     builder.addFormDataPart(it, null, body)
-                    hasVaule = true
+                    hasValue = true
                 }
             }
         }
@@ -307,12 +306,12 @@ abstract class AdapterBuilder : Builder {
                 if (file != null) {
                     if (body != null) {
                         builder.addFormDataPart(it, file.name, body)
-                        hasVaule = true
+                        hasValue = true
                     }
                 }
             }
         }
-        if (!hasVaule) {
+        if (!hasValue) {
             builder.addFormDataPart("body", "not appropriate body")
         }
         return builder.build()
