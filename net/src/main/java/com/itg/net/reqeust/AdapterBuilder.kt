@@ -36,6 +36,13 @@ abstract class AdapterBuilder : Builder {
     var cookies: String? = null
     var tag: String? = null
 
+
+    override fun addParam(key: String?, value: String?): Builder {
+        if (key.isNullOrBlank() || value.isNullOrBlank()) return this
+        params.append(key).append("#").append(value).append("$")
+        return this
+    }
+
     override fun addParam(map: MutableMap<String, String?>?): Builder {
         if (map.isNullOrEmpty()) return this
         map.forEach{entry->
@@ -44,15 +51,17 @@ abstract class AdapterBuilder : Builder {
         return this
     }
 
-    override fun addParam(key: String?, value: String?): Builder {
-        if (key.isNullOrBlank() || value.isNullOrBlank()) return this
-        params.append(key).append("#").append(value).append("$")
-        return this
-    }
-
     override fun addHeader(key: String?, value: String?): Builder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
         headerSb.append(key).append("#").append(value).append("$")
+        return this
+    }
+
+    override fun addHeader(map: MutableMap<String, String?>?): Builder {
+        if (map.isNullOrEmpty()) return this
+        map.forEach{entry->
+            addHeader(entry.key,entry.value)
+        }
         return this
     }
 

@@ -10,6 +10,7 @@ interface Builder {
     fun addParam(map:MutableMap<String,String?>?): Builder
     fun addParam(key: String?, value: String?): Builder
     fun addHeader(key: String?, value: String?): Builder
+    fun addHeader(map:MutableMap<String,String?>?): Builder
     fun url(url: String?): Builder
     fun send(callback: DdCallback?)
     fun send(handler: Handler?, what: Int, errorWhat: Int)
