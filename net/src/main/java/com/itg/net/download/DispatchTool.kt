@@ -37,33 +37,31 @@ class DispatchTool : Dispatch {
         val thread = HandlerThread("ddl")
         thread.start()
         looper = thread.looper
-        handler = ReceiverHandler(looper!!, object : Handler.Callback {
-            override fun handleMessage(msg: Message): Boolean {
-                synchronized(this) {
-                    if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
-                        val task = mTaskQueue.removeLast()
-                        mTaskQueueUrl.removeLast()
-                        if (task.append()) {
-                            appendDownload(task as DTask)
-                        } else {
-                            download(task as DTask)
-                        }
+        handler = ReceiverHandler(looper!!) {
+            synchronized(lock) {
+                if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
+                    val task = mTaskQueue.removeLast()
+                    mTaskQueueUrl.removeLast()
+                    if (task.append()) {
+                        appendDownload(task as DTask)
+                    } else {
+                        download(task as DTask)
                     }
                 }
-                return true
             }
-        })
+            true
+        }
     }
 
     override fun download(task: DTask) {
         task.progressCallback()?.onConnecting(task)
         if (isDownload(task)) {
-           sendDownloadRequest(task,null){type, tag ->
-               handleResult(task, type, tag)
-           }
+            sendDownloadRequest(task, null) { type, tag ->
+                handleResult(task, type, tag)
+            }
         } else {
             if (mTaskQueue.size > 0) {
-                handler?.sendEmptyMessage(DOWNLOAD_TASK)
+                sendMsg(null,DOWNLOAD_TASK)
             }
         }
     }
@@ -71,20 +69,26 @@ class DispatchTool : Dispatch {
     override fun appendDownload(task: DTask) {
         if (isDownload(task)) {
             task.progressCallback()?.onConnecting(task)
-            getBuilder(task,null).send(object : Callback{
+            getBuilder(task, null).send(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
                     handleResult(task, DOWNLOAD_FILE, e.message.toString())
                 }
 
                 override fun onResponse(call: Call, response: Response) {
                     if (response.code == 200) {
-                        val file = File(task.path()+".tmp")
+                        val file = File(task.path() + ".tmp")
                         if (file.exists()) {
-                            sendDownloadRequest(task,"${file.length()}-${response.body?.contentLength()?:0-1}"){type, tag ->
+                            sendDownloadRequest(
+                                task,
+                                "${file.length()}-${response.body?.contentLength() ?: 0 - 1}"
+                            ) { type, tag ->
                                 handleResult(task, type, tag)
                             }
                         } else {
-                            sendDownloadRequest(task,"${0}-${response.body?.contentLength()?:0-1}"){type, tag ->
+                            sendDownloadRequest(
+                                task,
+                                "${0}-${response.body?.contentLength() ?: 0 - 1}"
+                            ) { type, tag ->
                                 handleResult(task, type, tag)
                             }
                         }
@@ -137,7 +141,7 @@ class DispatchTool : Dispatch {
     @Synchronized
     fun isDownload(task: DTask): Boolean {
         if (task.url().equals(task.cancel())) {
-            handler?.sendEmptyMessage(CANCEL_TASK)
+            sendMsg(task,CANCEL_TASK)
             return false
         }
         if (!taskQueueHasTask(task) && !runningQueueHasTask(task)) {
@@ -156,7 +160,11 @@ class DispatchTool : Dispatch {
     }
 
 
-    fun sendDownloadRequest(task: DTask, header: String?,callback: (type: Int, tag: String) -> Unit) {
+    fun sendDownloadRequest(
+        task: DTask,
+        header: String?,
+        callback: (type: Int, tag: String) -> Unit
+    ) {
         getBuilder(task, header).send(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 handleResult(task, DOWNLOAD_FILE, e.message.toString())
@@ -165,13 +173,13 @@ class DispatchTool : Dispatch {
             override fun onResponse(call: Call, response: Response) {
                 if (task.append()) {
                     if (response.code == 206) {
-                        handleResponse(response, task,callback)
+                        handleResponse(response, task, callback)
                     } else {
                         handleResult(task, DOWNLOAD_FILE, "不支持断点续传")
                     }
                 } else {
                     if (response.code == 200) {
-                        handleResponse(response, task,callback)
+                        handleResponse(response, task, callback)
                     } else {
                         handleResult(task, DOWNLOAD_FILE, "response.code() = ${response.code}")
                     }
@@ -181,7 +189,7 @@ class DispatchTool : Dispatch {
     }
 
     private fun handleResult(task: DTask, type: Int, tag: String) {
-        synchronized(this) {
+        synchronized(lock) {
             mRunningTasksUrl.remove(task.url())
             mRunningTasks.remove(task)
         }
@@ -190,7 +198,7 @@ class DispatchTool : Dispatch {
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
-        handler?.sendEmptyMessage(DOWNLOAD_TASK)
+        sendMsg(null,DOWNLOAD_TASK)
     }
 
     private fun getBuilder(task: DTask, header: String?): Builder {
@@ -207,7 +215,7 @@ class DispatchTool : Dispatch {
         task: DTask,
         callback: (type: Int, tag: String) -> Unit
     ) {
-        val file = File(task.path()+".tmp" )
+        val file = File(task.path() + ".tmp")
         if (task.append()) {
             task.setContentLength(response.body?.contentLength() ?: 0 + file.length())
         } else {
@@ -279,22 +287,30 @@ class DispatchTool : Dispatch {
         }
     }
 
-    fun cancelTask(url:String?){
-        synchronized(this){
-            mTaskQueue.forEach {
-                if (it.url().equals(url)) {
-                    it.cancel(url)
-                }
-            }
-            mRunningTasks.forEach {
-                if (it.url().equals(url)) {
-                    it.cancel(url)
-                }
+    fun cancelTask(url: String?) {
+        var needDeleteTask: Task? = null
+        mTaskQueue.forEach {
+            if (it.url().equals(url)) {
+                it.cancel(url)
+                needDeleteTask = it
+                return@forEach
             }
         }
+        if (needDeleteTask != null) {
+            mTaskQueue.remove(needDeleteTask)
+            return
+        }
+        mRunningTasks.forEach {
+            if (it.url().equals(url)) {
+                it.cancel(url)
+                needDeleteTask = it
+                return@forEach
+            }
+        }
+        mRunningTasks.remove(needDeleteTask)
     }
 
-    fun getTask(url:String?):Task?{
+    fun getTask(url: String?): Task? {
         mTaskQueue.forEach {
             if (it.url().equals(url)) {
                 return it
@@ -309,9 +325,16 @@ class DispatchTool : Dispatch {
         return null
     }
 
-    fun isQueue(url:String?):Boolean{
-        synchronized(this) {
+    fun isQueue(url: String?): Boolean {
+        synchronized(lock) {
             return mRunningTasksUrl.contains(url) || mTaskQueueUrl.contains(url)
         }
+    }
+
+   private fun sendMsg(task:Task?,type: Int){
+        val msg = Message.obtain()
+        msg.obj = task
+        msg.what = type
+        handler?.sendMessage(msg)
     }
 }
