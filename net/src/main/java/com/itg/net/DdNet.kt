@@ -70,11 +70,13 @@ class DdNet {
         okhttpManager.okHttpClient.dispatcher.queuedCalls().forEach {
             if (tag == it.request().tag()) {
                 it.cancel()
+                return
             }
         }
         okhttpManager.okHttpClient.dispatcher.runningCalls().forEach {
             if (tag == it.request().tag()) {
                 it.cancel()
+                return
             }
         }
     }
