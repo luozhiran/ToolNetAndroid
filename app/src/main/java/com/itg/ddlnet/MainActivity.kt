@@ -59,6 +59,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
+
+            val a = mutableListOf<String>()
             DdNet.instance.post()
                 .url("")
                 .send(object :DdCallback{

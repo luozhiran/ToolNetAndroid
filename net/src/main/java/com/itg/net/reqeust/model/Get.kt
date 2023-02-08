@@ -10,7 +10,7 @@ import okhttp3.Callback
 import okhttp3.Request
 
 class Get : AdapterBuilder() {
-    override fun createCall(): Call {
+    override fun createCall(): Call? {
         val builder = Request.Builder()
         getHeader()?.apply { builder.headers(this) }
         val url = getParam()
@@ -18,6 +18,9 @@ class Get : AdapterBuilder() {
             builder.tag(url)
         } else {
             builder.tag(tag)
+        }
+        if (url.isBlank()) {
+            return null
         }
         builder.url(url)
         builder.get()

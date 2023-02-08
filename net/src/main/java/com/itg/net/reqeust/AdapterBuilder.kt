@@ -18,6 +18,7 @@ import java.io.IOException
 
 abstract class AdapterBuilder : Builder {
 
+    private val call_is_null_msg = "url is error,please check url"
     var url: String? = DdNet.instance.ddNetConfig.url
     private val headerSb = StringBuilder()
     private val params = StringBuilder()
@@ -189,7 +190,6 @@ abstract class AdapterBuilder : Builder {
     }
 
     fun getParam(urlParams: StringBuilder?=null): String {
-
         val urlParam = mergeParam(urlParams?:params) ?: return this.url ?: ""
         if (urlParam.isNotBlank()) {
             val urlBuild = Uri.parse(this.url).buildUpon()
@@ -322,6 +322,7 @@ abstract class AdapterBuilder : Builder {
 
     override fun send(callback: DdCallback?) {
         val call = createCall()
+        if (call == null)  callback?.onFailure(call_is_null_msg)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
@@ -339,6 +340,13 @@ abstract class AdapterBuilder : Builder {
 
     override fun send(handler: Handler?, what: Int, errorWhat: Int) {
         val call = createCall()
+        if (call == null) {
+            val msg = Message.obtain()
+            msg.what = errorWhat
+            msg.obj = call_is_null_msg
+            handler?.sendMessage(msg)
+        }
+
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
@@ -362,7 +370,7 @@ abstract class AdapterBuilder : Builder {
     }
 
     override fun send(response: Callback?) {
-        val call = createCall()
+        val call = createCall() ?: return
         if (response != null) {
             call?.enqueue(response)
         }
@@ -371,4 +379,5 @@ abstract class AdapterBuilder : Builder {
     override fun <T> asType(): T {
         return this as T
     }
+
 }

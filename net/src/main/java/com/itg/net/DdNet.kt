@@ -1,5 +1,6 @@
 package com.itg.net
 
+import android.app.Activity
 import com.itg.net.base.Builder
 import com.itg.net.download.CallbackMgr
 import com.itg.net.reqeust.create
@@ -8,6 +9,7 @@ import com.itg.net.reqeust.model.Get
 import com.itg.net.reqeust.model.Post
 import com.itg.net.reqeust.model.Put
 import java.lang.Exception
+import java.util.*
 
 
 class DdNet {
@@ -42,6 +44,7 @@ class DdNet {
     val okhttpManager: OkhttpManager by lazy { OkhttpManager(ddNetConfig) }
     val download: Download by lazy { Download() }
     val callbackMgr: CallbackMgr by lazy { CallbackMgr() }
+    val needAutoCancelUrl by lazy { WeakHashMap<Activity,MutableList<String>>() }
 
 
     fun builder(type: Int): Builder {
@@ -55,6 +58,8 @@ class DdNet {
     fun put() = builder(PUT) as Put
 
     fun delete() = builder(DELETE) as Delete
+
+
 
     fun cancelAll() {
         okhttpManager.okHttpClient.dispatcher.queuedCalls().forEach {

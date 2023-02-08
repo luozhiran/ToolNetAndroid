@@ -16,13 +16,16 @@ class Post : AdapterBuilder() {
     override fun createCall(): Call? {
         val builder = Request.Builder()
         getHeader()?.apply { builder.headers(this) }
-        val url = getParam()
+        val url = getParam(urlParams)
         if (tag.isNullOrEmpty()) {
             builder.tag(url)
         } else {
             builder.tag(tag)
         }
-        builder.url(url ?: "")
+        if (url.isBlank()) {
+          return null
+        }
+        builder.url(url)
         getRequestBody()?.apply { builder.post(this) }
         return DdNet.instance.okhttpManager.okHttpClient.newCall(builder.build())
     }
