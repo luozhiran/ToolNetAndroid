@@ -20,7 +20,7 @@ class DdNetConfig {
     var pkgName: String? = null
     val globalParams = HashMap<String, Any>()
     private var handler: Handler? = null
-     var application: Application? = null
+    var application: Application? = null
     private var mDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
     private var logPath: String? = null
     private val interceptors: MutableList<Interceptor> = ArrayList()
@@ -141,7 +141,7 @@ class DdNetConfig {
             return file.absolutePath
         }
 
-    fun useHttpLog(use:Boolean):DdNetConfig{
+    fun useHttpLog(use: Boolean): DdNetConfig {
         this.useHeepLogger = use
         if (use) {
             Logger.addLogAdapter(AndroidLogAdapter())
@@ -149,7 +149,7 @@ class DdNetConfig {
         return this
     }
 
-    fun useHttpLog():Boolean{
+    fun useHttpLog(): Boolean {
         return this.useHeepLogger
     }
 }
