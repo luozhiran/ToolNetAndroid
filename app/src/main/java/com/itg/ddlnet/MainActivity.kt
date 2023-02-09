@@ -24,6 +24,7 @@ class MainActivity : AppCompatActivity() {
                 .downloadTask()
                 .path("${filesDir}/a.png")
                 .url("https://img.ddimg.mobi/eec4b4388b26f1600152066290.png")
+                .autoCancel(this)
                 .prepareEnd()
                 .setProgressListener("https://img.ddimg.mobi/eec4b4388b26f1600152066290.png",object : IProgressCallback{
                     override fun onConnecting(task: Task?) {
@@ -81,6 +82,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        DdNet.instance.download.cancel(task)
+//        DdNet.instance.download.cancel(task)
     }
 }

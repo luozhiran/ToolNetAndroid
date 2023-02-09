@@ -97,7 +97,9 @@ class DispatchTool : Dispatch {
                     }
                 }
 
-            })
+            }){call: Call? ->
+                (task as? BusinessTask)?.registerEvent(call)
+            }
         }
     }
 
@@ -185,7 +187,9 @@ class DispatchTool : Dispatch {
                     }
                 }
             }
-        })
+        }){call: Call? ->
+            (task as? BusinessTask)?.registerEvent(call)
+        }
     }
 
     private fun handleResult(task: DTask, type: Int, tag: String) {

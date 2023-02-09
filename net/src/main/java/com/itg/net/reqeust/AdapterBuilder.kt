@@ -35,7 +35,7 @@ abstract class AdapterBuilder : Builder {
     var contents: MutableList<String?>? = null
     var contentMediaTypes: MutableList<String?>? = null
     var contentNames: MutableList<String?>? = null
-    protected var activity: Activity? = null
+    private var activity: Activity? = null
 
     var intervalOffset: Long = 0
     var intervalFile: File? = null
@@ -43,20 +43,6 @@ abstract class AdapterBuilder : Builder {
     var tag: String? = null
 
     private val lifeObservable by lazy { MyLifecycleEventObserver()}
-
-    class MyLifecycleEventObserver : LifecycleEventObserver {
-        var listener:(()->Unit)?=null
-
-        fun setCallback( callback:()->Unit){
-            listener = callback
-        }
-        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
-            if (event == Lifecycle.Event.ON_DESTROY) {
-                listener?.invoke()
-            }
-        }
-    }
-
 
 
     override fun addParam(key: String?, value: String?): Builder {
@@ -396,9 +382,10 @@ abstract class AdapterBuilder : Builder {
         })
     }
 
-    override fun send(response: Callback?) {
+    override fun send(response: Callback?,callback:((Call?)->Unit)?) {
         val call = createCall() ?: return
         if (response != null) {
+            callback?.invoke(call)
             call.enqueue(response)
         }
     }
@@ -417,6 +404,7 @@ abstract class AdapterBuilder : Builder {
         if (call == null) return
         val tempActivity = (activity as? ComponentActivity)
         lifeObservable.setCallback {
+            call.cancel()
             unregisterEvent()
         }
         tempActivity?.lifecycle?.addObserver(lifeObservable)
@@ -426,6 +414,7 @@ abstract class AdapterBuilder : Builder {
         val tempActivity = (activity as? ComponentActivity)
         tempActivity?.runOnUiThread {
             tempActivity.lifecycle.removeObserver(lifeObservable)
+            activity = null
         }
     }
 
