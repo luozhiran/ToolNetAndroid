@@ -45,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.get).setOnClickListener {
             DdNet.instance.get()
                 .url("https://www.baidu.com")
+                .autoCancel(this)
                 .send(object :DdCallback{
                     override fun onFailure(er: String?) {
 
@@ -59,10 +60,9 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
-
-            val a = mutableListOf<String>()
             DdNet.instance.post()
                 .url("")
+                .autoCancel(this)
                 .send(object :DdCallback{
                     override fun onFailure(er: String?) {
 

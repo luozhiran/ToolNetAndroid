@@ -1,6 +1,5 @@
 package com.itg.net
 
-import android.app.Activity
 import com.itg.net.base.Builder
 import com.itg.net.download.CallbackMgr
 import com.itg.net.reqeust.create
@@ -44,8 +43,6 @@ class DdNet {
     val okhttpManager: OkhttpManager by lazy { OkhttpManager(ddNetConfig) }
     val download: Download by lazy { Download() }
     val callbackMgr: CallbackMgr by lazy { CallbackMgr() }
-    val needAutoCancelUrl by lazy { WeakHashMap<Activity,MutableList<String>>() }
-
 
     fun builder(type: Int): Builder {
         return create(type) ?: throw Exception("dot support $type")

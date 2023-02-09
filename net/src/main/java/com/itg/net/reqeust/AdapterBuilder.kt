@@ -1,8 +1,13 @@
 package com.itg.net.reqeust
 
+import android.app.Activity
 import android.net.Uri
 import android.os.Handler
 import android.os.Message
+import androidx.activity.ComponentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import com.itg.net.DdNet
 import com.itg.net.base.Builder
 import com.itg.net.base.DdCallback
@@ -30,11 +35,28 @@ abstract class AdapterBuilder : Builder {
     var contents: MutableList<String?>? = null
     var contentMediaTypes: MutableList<String?>? = null
     var contentNames: MutableList<String?>? = null
+    protected var activity: Activity? = null
 
     var intervalOffset: Long = 0
     var intervalFile: File? = null
     var cookies: String? = null
     var tag: String? = null
+
+    private val lifeObservable by lazy { MyLifecycleEventObserver()}
+
+    class MyLifecycleEventObserver : LifecycleEventObserver {
+        var listener:(()->Unit)?=null
+
+        fun setCallback( callback:()->Unit){
+            listener = callback
+        }
+        override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                listener?.invoke()
+            }
+        }
+    }
+
 
 
     override fun addParam(key: String?, value: String?): Builder {
@@ -189,8 +211,8 @@ abstract class AdapterBuilder : Builder {
         }
     }
 
-    fun getParam(urlParams: StringBuilder?=null): String {
-        val urlParam = mergeParam(urlParams?:params) ?: return this.url ?: ""
+    fun getParam(urlParams: StringBuilder? = null): String {
+        val urlParam = mergeParam(urlParams ?: params) ?: return this.url ?: ""
         if (urlParam.isNotBlank()) {
             val urlBuild = Uri.parse(this.url).buildUpon()
             val keyValue = urlParam.toString().split("[$]")
@@ -322,18 +344,21 @@ abstract class AdapterBuilder : Builder {
 
     override fun send(callback: DdCallback?) {
         val call = createCall()
-        if (call == null)  callback?.onFailure(call_is_null_msg)
+        if (call == null) callback?.onFailure(call_is_null_msg)
+        registerEvent(call)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
                     callback?.onFailure(e.message)
                 }
+                finally()
             }
 
             override fun onResponse(call: Call, response: Response) {
                 if (!call.isCanceled()) {
                     callback?.onResponse(response.body?.string(), response.code)
                 }
+                finally()
             }
         })
     }
@@ -346,7 +371,7 @@ abstract class AdapterBuilder : Builder {
             msg.obj = call_is_null_msg
             handler?.sendMessage(msg)
         }
-
+        registerEvent(call)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
@@ -355,6 +380,7 @@ abstract class AdapterBuilder : Builder {
                     msg.obj = e.message
                     handler?.sendMessage(msg)
                 }
+                finally()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -365,6 +391,7 @@ abstract class AdapterBuilder : Builder {
                     msg.obj = response.body?.string()
                     handler?.sendMessage(msg)
                 }
+                finally()
             }
         })
     }
@@ -372,7 +399,7 @@ abstract class AdapterBuilder : Builder {
     override fun send(response: Callback?) {
         val call = createCall() ?: return
         if (response != null) {
-            call?.enqueue(response)
+            call.enqueue(response)
         }
     }
 
@@ -380,4 +407,29 @@ abstract class AdapterBuilder : Builder {
         return this as T
     }
 
+    override fun autoCancel(activity: Activity?): Builder {
+        this.activity = activity
+        return this
+    }
+
+
+    private fun registerEvent(call: Call?) {
+        if (call == null) return
+        val tempActivity = (activity as? ComponentActivity)
+        lifeObservable.setCallback {
+            unregisterEvent()
+        }
+        tempActivity?.lifecycle?.addObserver(lifeObservable)
+    }
+
+    private fun unregisterEvent() {
+        val tempActivity = (activity as? ComponentActivity)
+        tempActivity?.runOnUiThread {
+            tempActivity.lifecycle.removeObserver(lifeObservable)
+        }
+    }
+
+    private fun finally(){
+        unregisterEvent()
+    }
 }

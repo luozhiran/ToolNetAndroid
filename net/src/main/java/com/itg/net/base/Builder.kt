@@ -1,5 +1,6 @@
 package com.itg.net.base
 
+import android.app.Activity
 import android.os.Handler
 import com.itg.net.reqeust.model.Post
 import okhttp3.Callback
@@ -24,5 +25,6 @@ interface Builder {
     fun addCookie(cookie: Cookie?): Builder
     fun addCookie(cookie: List<Cookie?>?): Builder
     fun addTag(tag: String?): Builder
+    fun autoCancel(activity: Activity?):Builder
     fun <T> asType():T
 }
