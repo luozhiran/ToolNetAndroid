@@ -25,6 +25,7 @@ class MainActivity : AppCompatActivity() {
                 .path("${filesDir}/a.png")
                 .url("https://img.ddimg.mobi/eec4b4388b26f1600152066290.png")
                 .autoCancel(this)
+                .md5("b86af7bcbb96804377359266a3eaceb7")
                 .prepareEnd()
                 .setProgressListener("https://img.ddimg.mobi/eec4b4388b26f1600152066290.png",object : IProgressCallback{
                     override fun onConnecting(task: Task?) {
@@ -36,7 +37,7 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     override fun onFail(error: String?, url: String?) {
-                        Log.e("MainActivity","onFail")
+                        Log.e("MainActivity","onFail $error")
                     }
 
                 })

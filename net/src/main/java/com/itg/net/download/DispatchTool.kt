@@ -1,6 +1,5 @@
 package com.itg.net.download
 
-import android.os.Handler
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
@@ -13,6 +12,9 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 import java.io.*
+import java.math.BigInteger
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
 
 
 class DispatchTool : Dispatch {
@@ -61,7 +63,7 @@ class DispatchTool : Dispatch {
             }
         } else {
             if (mTaskQueue.size > 0) {
-                sendMsg(null,DOWNLOAD_TASK)
+                sendMsg(null, DOWNLOAD_TASK)
             }
         }
     }
@@ -97,7 +99,7 @@ class DispatchTool : Dispatch {
                     }
                 }
 
-            }){call: Call? ->
+            }) { call: Call? ->
                 (task as? BusinessTask)?.registerEvent(call)
             }
         }
@@ -143,7 +145,7 @@ class DispatchTool : Dispatch {
     @Synchronized
     fun isDownload(task: DTask): Boolean {
         if (task.url().equals(task.cancel())) {
-            sendMsg(task,CANCEL_TASK)
+            sendMsg(task, CANCEL_TASK)
             return false
         }
         if (!taskQueueHasTask(task) && !runningQueueHasTask(task)) {
@@ -187,7 +189,7 @@ class DispatchTool : Dispatch {
                     }
                 }
             }
-        }){call: Call? ->
+        }) { call: Call? ->
             (task as? BusinessTask)?.registerEvent(call)
         }
     }
@@ -202,7 +204,7 @@ class DispatchTool : Dispatch {
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
-        sendMsg(null,DOWNLOAD_TASK)
+        sendMsg(null, DOWNLOAD_TASK)
     }
 
     private fun getBuilder(task: DTask, header: String?): Builder {
@@ -267,8 +269,20 @@ class DispatchTool : Dispatch {
                 } else {
                     if (cur != pre) {
                         if (cur == 100) {
-                            file.renameTo(File(file.absolutePath.replace(".tmp", "")))
-                            callback.invoke(DOWNLOAD_SUCCESS, "任务下载成功")
+                            if (needCheckMd5(task)) {
+                                if (!checkMd5(task.md5(), file.absolutePath)) {
+                                    File(task.path().toString() + ".tmp").delete()
+                                    callback.invoke(DOWNLOAD_FILE, "md5校验失败")
+                                    return
+                                }
+                            }
+                            val distFile = File(file.absolutePath.replace(".tmp", ""))
+                            val renameSuccess = file.renameTo(distFile)
+                            if (renameSuccess) {
+                                callback.invoke(DOWNLOAD_SUCCESS, "任务下载成功")
+                            } else {
+                                callback.invoke(DOWNLOAD_FILE, "下载任务失败，重命名失败")
+                            }
                         } else {
                             task.progressCallback()?.onProgress(task)
                         }
@@ -316,8 +330,8 @@ class DispatchTool : Dispatch {
         mRunningTasksUrl.remove(needDeleteTask!!.url())
     }
 
-    fun cancelTask(task:Task?){
-        if (task == null)return
+    fun cancelTask(task: Task?) {
+        if (task == null) return
         mTaskQueue.remove(task)
         mTaskQueueUrl.remove(task.url())
         mRunningTasks.remove(task)
@@ -345,10 +359,50 @@ class DispatchTool : Dispatch {
         }
     }
 
-   private fun sendMsg(task:Task?,type: Int){
+    private fun sendMsg(task: Task?, type: Int) {
         val msg = Message.obtain()
         msg.obj = task
         msg.what = type
         handler?.sendMessage(msg)
+    }
+
+
+    private fun getMD5Three(path: String?): String? {
+        var bi: BigInteger? = null
+        try {
+            val buffer = ByteArray(8192)
+            var len = 0
+            val md: MessageDigest = MessageDigest.getInstance("MD5")
+            val f = File(path)
+            val fis = FileInputStream(f)
+            while (fis.read(buffer).also { len = it } != -1) {
+                md.update(buffer, 0, len)
+            }
+            fis.close()
+            val b: ByteArray = md.digest()
+            bi = BigInteger(1, b)
+        } catch (e: NoSuchAlgorithmException) {
+            e.printStackTrace()
+        } catch (e: IOException) {
+            e.printStackTrace()
+        }
+        return bi?.toString(16)
+    }
+
+
+    private fun needCheckMd5(task: DTask?): Boolean {
+        val md5 = task?.md5()
+        if (md5.orEmpty().isNotBlank()) {
+            return true
+        }
+        return false
+    }
+
+    private fun checkMd5(targetMd5: String?, path: String?): Boolean {
+        if (targetMd5.orEmpty().isNotBlank()) {
+            val downloadFileMd5 = getMD5Three(path)
+            return downloadFileMd5 == targetMd5
+        }
+        return false
     }
 }
