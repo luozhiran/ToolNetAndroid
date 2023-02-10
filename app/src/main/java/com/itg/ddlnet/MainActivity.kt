@@ -37,50 +37,50 @@ class MainActivity : AppCompatActivity() {
 //        DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
 
-//            task = DdNet.instance.download
-//                .downloadTask()
-//                .path("${filesDir}/b.png")
-//                .url("https://img.ddimg.mobi/product/590065d8f61271624240162850.png?width=800&height=800")
-//                .autoCancel(this)
-//                .prepareEnd()
-//                .setProgressListener(object : IProgressCallback{
-//                    override fun onConnecting(task: Task?) {
-//                        Log.e("MainActivity","onConnecting-b")
-//                    }
-//
-//                    override fun onProgress(task: Task?) {
-//                        Log.e("MainActivity","onProgress-b:"+task?.getProgress())
-//                    }
-//
-//                    override fun onFail(error: String?, task: Task?) {
-//                        Log.e("MainActivity","onFail-b $error")
-//                    }
-//
-//                })
-//                .start()
-//
-//
-//            task = DdNet.instance.download
-//                .downloadTask()
-//                .path("${filesDir}/c.png")
-//                .url("https://img.ddimg.mobi/722b57d9fac981636363734597.png")
-//                .autoCancel(this)
-//                .prepareEnd()
-//                .setProgressListener(object : IProgressCallback{
-//                    override fun onConnecting(task: Task?) {
-//                        Log.e("MainActivity","onConnecting-c")
-//                    }
-//
-//                    override fun onProgress(task: Task?) {
-//                        Log.e("MainActivity","onProgress-c:"+task?.getProgress())
-//                    }
-//
-//                    override fun onFail(error: String?, task: Task?) {
-//                        Log.e("MainActivity","onFail-c $error")
-//                    }
-//
-//                })
-//                .start()
+            task = DdNet.instance.download
+                .downloadTask()
+                .path("${filesDir}/b.png")
+                .url("https://img.ddimg.mobi/product/590065d8f61271624240162850.png?width=800&height=800")
+                .autoCancel(this)
+                .prepareEnd()
+                .setProgressListener(object : IProgressCallback{
+                    override fun onConnecting(task: Task?) {
+                        Log.e("MainActivity","onConnecting-b")
+                    }
+
+                    override fun onProgress(task: Task?) {
+                        Log.e("MainActivity","onProgress-b:"+task?.getProgress())
+                    }
+
+                    override fun onFail(error: String?, task: Task?) {
+                        Log.e("MainActivity","onFail-b $error")
+                    }
+
+                })
+                .start()
+
+
+            task = DdNet.instance.download
+                .downloadTask()
+                .path("${filesDir}/c.png")
+                .url("https://img.ddimg.mobi/722b57d9fac981636363734597.png")
+                .autoCancel(this)
+                .prepareEnd()
+                .setProgressListener(object : IProgressCallback{
+                    override fun onConnecting(task: Task?) {
+                        Log.e("MainActivity","onConnecting-c")
+                    }
+
+                    override fun onProgress(task: Task?) {
+                        Log.e("MainActivity","onProgress-c:"+task?.getProgress())
+                    }
+
+                    override fun onFail(error: String?, task: Task?) {
+                        Log.e("MainActivity","onFail-c $error")
+                    }
+
+                })
+                .start()
 
             task = DdNet.instance.download
                 .downloadTask()
