@@ -56,12 +56,13 @@ class DispatchTool : Dispatch {
     }
 
     override fun download(task: DTask) {
-        task.progressCallback()?.onConnecting(task)
         if (isDownload(task)) {
+            task.progressCallback()?.onConnecting(task)
             sendDownloadRequest(task, null) { type, tag ->
                 handleResult(task, type, tag)
             }
         } else {
+            task.progressCallback()?.onFail("任务已经在下载或者在下载队列",task)
             if (mTaskQueue.size > 0) {
                 sendMsg(null, DOWNLOAD_TASK)
             }
@@ -107,16 +108,12 @@ class DispatchTool : Dispatch {
 
     @Synchronized
     fun taskQueueHasTask(task: DTask): Boolean {
-        val hasUrl = mTaskQueueUrl.contains(task.url())
-        val hasTask = mTaskQueue.contains(task)
-        return hasUrl && hasTask
+        return mTaskQueueUrl.contains(task.url())
     }
 
     @Synchronized
     fun runningQueueHasTask(task: DTask): Boolean {
-        val hasUrl = mRunningTasksUrl.contains(task.url())
-        val hasTask = mRunningTasks.contains(task)
-        return hasUrl && hasTask
+        return mRunningTasksUrl.contains(task.url())
     }
 
 
@@ -154,13 +151,6 @@ class DispatchTool : Dispatch {
 
         if (taskQueueHasTask(task) && !runningQueueHasTask(task)) {
             if (putTaskToRunning(task, true)) return true
-        }
-
-        if (!taskQueueHasTask(task)) {
-            putTaskToQueue(task)
-        } else {
-            //没有添加到任务队列，需要把全局的任务回调删除掉，防止内存泄露
-            TaskCallbackMgr.instance.removeProgressCallback(task)
         }
         return false
     }

@@ -75,12 +75,16 @@ class BusinessTask : DTask() {
     fun registerEvent(call: Call?,task: Task) {
         if (call == null) return
         val tempActivity = (activity as? ComponentActivity)
-        lifeObservable.setCallback {
-            call.cancel()
-            unregisterEvent(task)
-            TaskCallbackMgr.instance.removeProgressCallback(this)
+        tempActivity?.let {
+            it.runOnUiThread {
+                lifeObservable.setCallback {
+                    call.cancel()
+                    unregisterEvent(task)
+                    TaskCallbackMgr.instance.removeProgressCallback(this)
+                }
+                it.lifecycle.addObserver(lifeObservable)
+            }
         }
-        tempActivity?.lifecycle?.addObserver(lifeObservable)
     }
 
     private fun unregisterEvent(task: Task?) {

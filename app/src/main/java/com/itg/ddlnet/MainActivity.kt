@@ -14,28 +14,27 @@ import java.io.File
 
 class MainActivity : AppCompatActivity() {
     var task:Task?=null
+    private val progress = object : IProgressCallback{
+        override fun onConnecting(task: Task?) {
+            Log.e("MainActivity","global onConnecting")
+
+        }
+
+        override fun onProgress(task: Task?) {
+            Log.e("MainActivity","global onProgress"+task?.getProgress())
+
+        }
+
+        override fun onFail(error: String?, task: Task?) {
+            Log.e("MainActivity","global onConnecting")
+
+        }
+
+    }
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-
-        DdNet.instance.download.setGlobalProgressListener(object : IProgressCallback{
-            override fun onConnecting(task: Task?) {
-                Log.e("MainActivity","global onConnecting")
-
-
-            }
-
-            override fun onProgress(task: Task?) {
-                Log.e("MainActivity","global onProgress"+task?.getProgress())
-
-            }
-
-            override fun onFail(error: String?, task: Task?) {
-                Log.e("MainActivity","global onConnecting")
-
-            }
-
-        })
+//        DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
             task = DdNet.instance.download
                 .downloadTask()
@@ -59,6 +58,29 @@ class MainActivity : AppCompatActivity() {
 
                 })
                 .start()
+            task = DdNet.instance.download
+                .downloadTask()
+                .path("${filesDir}/b.png")
+                .url("https://img.ddimg.mobi/eec4b4388b26f1600152066240.png")
+                .autoCancel(this)
+                .md5("b86af7bcbb96804377359266a3eaceb7")
+                .prepareEnd()
+                .setProgressListener(object : IProgressCallback{
+                    override fun onConnecting(task: Task?) {
+                        Log.e("MainActivity","onConnecting-======")
+                    }
+
+                    override fun onProgress(task: Task?) {
+                        Log.e("MainActivity","onProgress==="+task?.getProgress())
+                    }
+
+                    override fun onFail(error: String?, task: Task?) {
+                        Log.e("MainActivity","onFail=== $error")
+                    }
+
+                })
+                .start()
+
         }
 
         findViewById<Button>(R.id.get).setOnClickListener {
@@ -100,6 +122,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-//        DdNet.instance.download.cancel(task)
+        DdNet.instance.download.setGlobalProgressListener(progress)
     }
 }
