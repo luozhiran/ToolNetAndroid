@@ -61,9 +61,8 @@ class MainActivity : AppCompatActivity() {
             task = DdNet.instance.download
                 .downloadTask()
                 .path("${filesDir}/b.png")
-                .url("https://img.ddimg.mobi/eec4b4388b26f1600152066240.png")
+                .url("https://img.ddimg.mobi/product/590065d8f61271624240162850.png?width=800&height=800")
                 .autoCancel(this)
-                .md5("b86af7bcbb96804377359266a3eaceb7")
                 .prepareEnd()
                 .setProgressListener(object : IProgressCallback{
                     override fun onConnecting(task: Task?) {
