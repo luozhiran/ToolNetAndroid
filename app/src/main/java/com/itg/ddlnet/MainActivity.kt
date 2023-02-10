@@ -63,7 +63,7 @@ class MainActivity : AppCompatActivity() {
             task = DdNet.instance.download
                 .downloadTask()
                 .path("${filesDir}/c.png")
-                .url("https://img.ddimg.mobi/722b57d9fac981636363734597.png")
+                .url("http://img.ddimg.mobi/722b57d9fac981636363734597.png")
                 .autoCancel(this)
                 .prepareEnd()
                 .setProgressListener(object : IProgressCallback{
