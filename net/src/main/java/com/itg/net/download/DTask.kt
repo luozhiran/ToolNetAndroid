@@ -18,6 +18,7 @@ abstract class DTask : Task {
     private var tComponentName: String? = null
     private var tCostomBroadcast: String? = null
     private var tExtra: String? = null
+    val uniqueId = System.currentTimeMillis()
 
     /**
      * 当前下载任务，如果支持断点续传，append设置为true

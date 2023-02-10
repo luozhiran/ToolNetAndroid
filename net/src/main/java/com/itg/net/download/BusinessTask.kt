@@ -26,13 +26,15 @@ class BusinessTask : DTask() {
             override fun onConnecting(task: Task?) {
                 if (task == null) return
                 DdNet.instance.callbackMgr.loopConnecting(task as DTask)
+                TaskCallbackMgr.instance.loopConnecting(task)
             }
 
             override fun onProgress(task: Task?) {
                 if (task == null) return
                 DdNet.instance.callbackMgr.loop(task as DTask)
+                TaskCallbackMgr.instance.loop(task)
                 if (task.getProgress() !=100)return
-                unregisterEvent()
+                unregisterEvent(task)
                 var intent:Intent?=null
                 if (task.customBroadcast().orEmpty().isNotBlank()) {
                     intent = Intent(task.customBroadcast())
@@ -52,9 +54,10 @@ class BusinessTask : DTask() {
 
             }
 
-            override fun onFail(error: String?, url: String?) {
-                DdNet.instance.callbackMgr.loopFail(error ?: "", url ?: "")
-                unregisterEvent()
+            override fun onFail(error: String?, task:Task?) {
+                DdNet.instance.callbackMgr.loopFail(error ?: "", task as? DTask?)
+                TaskCallbackMgr.instance.loopFail(error ?: "",task as? DTask?)
+                unregisterEvent(task)
 
             }
         })
@@ -69,18 +72,22 @@ class BusinessTask : DTask() {
         return ConversionPlugin(this)
     }
 
-    fun registerEvent(call: Call?) {
+    fun registerEvent(call: Call?,task: Task) {
         if (call == null) return
         val tempActivity = (activity as? ComponentActivity)
         lifeObservable.setCallback {
             call.cancel()
-            unregisterEvent()
+            unregisterEvent(task)
+            TaskCallbackMgr.instance.removeProgressCallback(this)
         }
         tempActivity?.lifecycle?.addObserver(lifeObservable)
     }
 
-    private fun unregisterEvent() {
+    private fun unregisterEvent(task: Task?) {
         val tempActivity = (activity as? ComponentActivity)
+        if (task is DTask) {
+            TaskCallbackMgr.instance.removeProgressCallback(task)
+        }
         tempActivity?.runOnUiThread {
             tempActivity.lifecycle.removeObserver(lifeObservable)
             activity = null

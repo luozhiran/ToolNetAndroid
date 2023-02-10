@@ -12,5 +12,5 @@ interface IProgressCallback {
 
     fun onProgress(task: Task?)
 
-    fun onFail(error: String?, url: String?)
+    fun onFail(error: String?, task: Task?)
 }

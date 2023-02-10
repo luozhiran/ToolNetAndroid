@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
                 .autoCancel(this)
                 .md5("b86af7bcbb96804377359266a3eaceb7")
                 .prepareEnd()
-                .setProgressListener("https://img.ddimg.mobi/eec4b4388b26f1600152066290.png",object : IProgressCallback{
+                .setProgressListener(object : IProgressCallback{
                     override fun onConnecting(task: Task?) {
                         Log.e("MainActivity","onConnecting")
                     }
@@ -36,7 +36,7 @@ class MainActivity : AppCompatActivity() {
                         Log.e("MainActivity","onProgress"+task?.getProgress())
                     }
 
-                    override fun onFail(error: String?, url: String?) {
+                    override fun onFail(error: String?, task: Task?) {
                         Log.e("MainActivity","onFail $error")
                     }
 

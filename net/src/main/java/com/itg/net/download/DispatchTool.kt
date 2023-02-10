@@ -100,7 +100,7 @@ class DispatchTool : Dispatch {
                 }
 
             }) { call: Call? ->
-                (task as? BusinessTask)?.registerEvent(call)
+                (task as? BusinessTask)?.registerEvent(call,task)
             }
         }
     }
@@ -158,8 +158,10 @@ class DispatchTool : Dispatch {
 
         if (!taskQueueHasTask(task)) {
             putTaskToQueue(task)
+        } else {
+            //没有添加到任务队列，需要把全局的任务回调删除掉，防止内存泄露
+            TaskCallbackMgr.instance.removeProgressCallback(task)
         }
-
         return false
     }
 
@@ -190,7 +192,7 @@ class DispatchTool : Dispatch {
                 }
             }
         }) { call: Call? ->
-            (task as? BusinessTask)?.registerEvent(call)
+            (task as? BusinessTask)?.registerEvent(call,task)
         }
     }
 
@@ -200,7 +202,7 @@ class DispatchTool : Dispatch {
             mRunningTasks.remove(task)
         }
         if (type == DOWNLOAD_FILE) {
-            task.progressCallback()?.onFail(tag, task.url())
+            task.progressCallback()?.onFail(tag, task)
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
@@ -317,6 +319,9 @@ class DispatchTool : Dispatch {
         if (needDeleteTask != null) {
             mTaskQueue.remove(needDeleteTask)
             mTaskQueueUrl.remove(needDeleteTask!!.url())
+            if (needDeleteTask is DTask) {
+                TaskCallbackMgr.instance.removeProgressCallback(needDeleteTask as DTask)
+            }
             return
         }
         mRunningTasks.forEach {
@@ -328,6 +333,9 @@ class DispatchTool : Dispatch {
         }
         mRunningTasks.remove(needDeleteTask)
         mRunningTasksUrl.remove(needDeleteTask!!.url())
+        if (needDeleteTask is DTask) {
+            TaskCallbackMgr.instance.removeProgressCallback(needDeleteTask as DTask)
+        }
     }
 
     fun cancelTask(task: Task?) {
@@ -336,6 +344,9 @@ class DispatchTool : Dispatch {
         mTaskQueueUrl.remove(task.url())
         mRunningTasks.remove(task)
         mRunningTasksUrl.remove(task.url())
+        if (task is DTask) {
+            TaskCallbackMgr.instance.removeProgressCallback(task)
+        }
     }
 
     fun getTask(url: String?): Task? {

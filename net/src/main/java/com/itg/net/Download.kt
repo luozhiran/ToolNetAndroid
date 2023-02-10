@@ -14,12 +14,13 @@ class Download {
         return BusinessTask()
     }
 
-    fun setProgressListener(url: String, progressBack: IProgressCallback) {
-        DdNet.instance.callbackMgr.addProgressCallbackToMap(url, progressBack)
+
+    fun setGlobalProgressListener(progressBack: IProgressCallback) {
+        DdNet.instance.callbackMgr.addProgressCallback(progressBack)
     }
 
-    fun remoteProgressListener(url: String) {
-        DdNet.instance.callbackMgr.removeProgressBackForMap(url)
+    fun remoteGlobalProgressListener(progressBack: IProgressCallback) {
+        DdNet.instance.callbackMgr.removeProgressBack(progressBack)
     }
 
     fun isQueue(url: String): Boolean {
