@@ -15,9 +15,9 @@ import java.util.*
 
 
 class DdNetConfig {
-    var url: String? = null
-    var maxDownloadNum = 3
-    var pkgName: String? = null
+    internal var url: String? = null
+    internal var maxDownloadNum = 3
+    internal var pkgName: String? = null
     val globalParams = HashMap<String, Any>()
     private var handler: Handler? = null
     var application: Application? = null
@@ -151,5 +151,10 @@ class DdNetConfig {
 
     fun useHttpLog(): Boolean {
         return this.useHeepLogger
+    }
+
+    fun maxDownloadNum(max:Int):DdNetConfig{
+        maxDownloadNum = max
+        return this
     }
 }

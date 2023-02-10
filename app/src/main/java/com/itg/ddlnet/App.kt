@@ -10,6 +10,7 @@ class App:Application() {
         
         DdNet.instance.ddNetConfig
             .app(this)
+            .maxDownloadNum(1)
             .useHttpLog(true)
             .url("https://www.baidu.com")
     }

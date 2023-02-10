@@ -42,8 +42,8 @@ class DispatchTool : Dispatch {
         handler = ReceiverHandler(looper!!) {
             synchronized(lock) {
                 if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
-                    val task = mTaskQueue.removeLast()
-                    mTaskQueueUrl.removeLast()
+                    val task = mTaskQueue.removeFirst()
+                    mTaskQueueUrl.removeFirst()
                     if (task.append()) {
                         appendDownload(task as DTask)
                     } else {
@@ -62,10 +62,7 @@ class DispatchTool : Dispatch {
                 handleResult(task, type, tag)
             }
         } else {
-            task.progressCallback()?.onFail("任务已经在下载或者在下载队列",task)
-            if (mTaskQueue.size > 0) {
-                sendMsg(null, DOWNLOAD_TASK)
-            }
+            needSendDownloadRequest()
         }
     }
 
@@ -103,6 +100,8 @@ class DispatchTool : Dispatch {
             }) { call: Call? ->
                 (task as? BusinessTask)?.registerEvent(call,task)
             }
+        } else {
+            needSendDownloadRequest()
         }
     }
 
@@ -114,6 +113,13 @@ class DispatchTool : Dispatch {
     @Synchronized
     fun runningQueueHasTask(task: DTask): Boolean {
         return mRunningTasksUrl.contains(task.url())
+    }
+
+
+   private fun needSendDownloadRequest(){
+        if (mRunningTasksUrl.size == 0&& mTaskQueueUrl.size >0) {
+            sendMsg(null, DOWNLOAD_TASK)
+        }
     }
 
 
@@ -152,6 +158,11 @@ class DispatchTool : Dispatch {
         if (taskQueueHasTask(task) && !runningQueueHasTask(task)) {
             if (putTaskToRunning(task, true)) return true
         }
+        if (!taskQueueHasTask(task)) {
+            putTaskToQueue(task)
+            return false
+        }
+        task.progressCallback()?.onFail("任务已经在下载或者在下载队列",task)
         return false
     }
 
