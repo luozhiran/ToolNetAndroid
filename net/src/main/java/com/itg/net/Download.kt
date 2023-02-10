@@ -14,11 +14,18 @@ class Download {
         return BusinessTask()
     }
 
-
+    /**
+     * 监听所有下载任务的回调
+     * @param progressBack IProgressCallback
+     */
     fun setGlobalProgressListener(progressBack: IProgressCallback) {
         DdNet.instance.callbackMgr.addProgressCallback(progressBack)
     }
 
+    /**
+     * 和setGlobalProgressListener配套使用
+     * @param progressBack IProgressCallback
+     */
     fun remoteGlobalProgressListener(progressBack: IProgressCallback) {
         DdNet.instance.callbackMgr.removeProgressBack(progressBack)
     }

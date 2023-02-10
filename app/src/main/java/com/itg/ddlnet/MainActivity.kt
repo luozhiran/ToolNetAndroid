@@ -18,8 +18,25 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        DdNet.instance.download.setGlobalProgressListener(object : IProgressCallback{
+            override fun onConnecting(task: Task?) {
+                Log.e("MainActivity","global onConnecting")
+
+
+            }
+
+            override fun onProgress(task: Task?) {
+                Log.e("MainActivity","global onProgress"+task?.getProgress())
+
+            }
+
+            override fun onFail(error: String?, task: Task?) {
+                Log.e("MainActivity","global onConnecting")
+
+            }
+
+        })
         findViewById<Button>(R.id.download).setOnClickListener {
-            DdNet.instance.download.cancel(task)
             task = DdNet.instance.download
                 .downloadTask()
                 .path("${filesDir}/a.png")
