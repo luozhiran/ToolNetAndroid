@@ -55,6 +55,10 @@ class BusinessTask : DTask() {
             }
 
             override fun onFail(error: String?, task:Task?) {
+                if (task?.getProgress()?:-1 >0) {
+                    DdNet.instance.callbackMgr.loop(task as DTask)
+                    TaskCallbackMgr.instance.loop(task)
+                }
                 DdNet.instance.callbackMgr.loopFail(error ?: "", task as? DTask?)
                 TaskCallbackMgr.instance.loopFail(error ?: "",task as? DTask?)
                 unregisterEvent(task)
