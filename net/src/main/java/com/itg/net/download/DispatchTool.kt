@@ -320,9 +320,6 @@ class DispatchTool : Dispatch {
         if (needDeleteTask != null) {
             mTaskQueue.remove(needDeleteTask)
             mTaskQueueUrl.remove(needDeleteTask!!.url())
-            if (needDeleteTask is DTask) {
-                TaskCallbackMgr.instance.removeProgressCallback(needDeleteTask as DTask)
-            }
             return
         }
         mRunningTasks.forEach {
@@ -337,9 +334,6 @@ class DispatchTool : Dispatch {
             mRunningTasksUrl.remove(needDeleteTask!!.url())
             DdNet.instance.cancelFirstTag(url)
         }
-        if (needDeleteTask is DTask) {
-            TaskCallbackMgr.instance.removeProgressCallback(needDeleteTask as DTask)
-        }
     }
 
     fun cancelTask(task: Task?) {
@@ -353,9 +347,6 @@ class DispatchTool : Dispatch {
         }
         mRunningTasksUrl.remove(task.url())
 
-        if (task is DTask) {
-            TaskCallbackMgr.instance.removeProgressCallback(task)
-        }
     }
 
     fun getTask(url: String?): Task? {
