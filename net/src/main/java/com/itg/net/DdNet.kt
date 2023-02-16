@@ -72,6 +72,21 @@ class DdNet {
         okhttpManager.okHttpClient.dispatcher.queuedCalls().forEach {
             if (tag == it.request().tag()) {
                 it.cancel()
+            }
+        }
+        okhttpManager.okHttpClient.dispatcher.runningCalls().forEach {
+            if (tag == it.request().tag()) {
+                it.cancel()
+            }
+        }
+    }
+
+
+    fun cancelFirstTag(tag: Any?) {
+        if (tag == null) return
+        okhttpManager.okHttpClient.dispatcher.queuedCalls().forEach {
+            if (tag == it.request().tag()) {
+                it.cancel()
                 return
             }
         }
