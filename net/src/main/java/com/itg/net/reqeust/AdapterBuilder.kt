@@ -120,6 +120,12 @@ abstract class AdapterBuilder : Builder {
         return this
     }
 
+    /**
+     * 使用改功能后，post不能携带其他数据，只能并且只能上传这一个文件
+     * @param file File?
+     * @param offset Long
+     * @return IntervalFileCastrationBuilder
+     */
     override fun addInterval(file: File?, offset: Long): IntervalFileCastrationBuilder {
         intervalFile = file
         intervalOffset = offset
