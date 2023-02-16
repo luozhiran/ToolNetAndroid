@@ -24,8 +24,9 @@ abstract class DTask : Task {
      * 当前下载任务，如果支持断点续传，append设置为true
      * @param append Boolean
      */
-    fun append(append: Boolean) {
+    fun append(append: Boolean):BusinessTask {
         tAppend = append
+        return this as BusinessTask
     }
 
 
