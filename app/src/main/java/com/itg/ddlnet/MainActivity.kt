@@ -34,7 +34,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-//        DdNet.instance.download.setGlobalProgressListener(progress)
+        DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
             task = DdNet.instance.download
                 .downloadTask()
@@ -49,7 +49,6 @@ class MainActivity : AppCompatActivity() {
 
                     override fun onProgress(task: Task?) {
                         Log.e("MainActivity","onProgress-b:"+task?.getProgress())
-                        DdNet.instance.download.cancel("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
 
                     }
 
