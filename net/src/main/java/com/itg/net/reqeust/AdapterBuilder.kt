@@ -5,14 +5,12 @@ import android.net.Uri
 import android.os.Handler
 import android.os.Message
 import androidx.activity.ComponentActivity
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.LifecycleOwner
 import com.itg.net.DdNet
 import com.itg.net.base.Builder
 import com.itg.net.base.DdCallback
 import com.itg.net.reqeust.body.IntervalBody
 import com.itg.net.reqeust.body.IntervalBodyBuilder
+import com.itg.net.reqeust.castration.IntervalFileCastrationBuilder
 import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
@@ -122,10 +120,10 @@ abstract class AdapterBuilder : Builder {
         return this
     }
 
-    override fun addInterval(file: File?, offset: Long): Builder {
+    override fun addInterval(file: File?, offset: Long): IntervalFileCastrationBuilder {
         intervalFile = file
         intervalOffset = offset
-        return this
+        return IntervalFileCastrationBuilder(this)
     }
 
     override fun addCookie(cookie: Cookie?): Builder = addCookie(mutableListOf(cookie))
@@ -216,11 +214,11 @@ abstract class AdapterBuilder : Builder {
 
 
     fun getRequestBody(): RequestBody? {
-        val formParams = mergeParam(params)
         if (intervalFile != null) {
             val requestBody = getIntervalBody()
             if (requestBody != null) return requestBody
         }
+        val formParams = mergeParam(params)
         return if (contents.orEmpty()
                 .isNotEmpty() && formParams.isNullOrBlank() && files.isNullOrEmpty()
         ) {
