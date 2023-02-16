@@ -332,9 +332,11 @@ class DispatchTool : Dispatch {
                 return@forEach
             }
         }
-        mRunningTasks.remove(needDeleteTask)
-        mRunningTasksUrl.remove(needDeleteTask!!.url())
-        DdNet.instance.cancelFirstTag(url)
+        if (needDeleteTask!=null) {
+            mRunningTasks.remove(needDeleteTask)
+            mRunningTasksUrl.remove(needDeleteTask!!.url())
+            DdNet.instance.cancelFirstTag(url)
+        }
         if (needDeleteTask is DTask) {
             TaskCallbackMgr.instance.removeProgressCallback(needDeleteTask as DTask)
         }
