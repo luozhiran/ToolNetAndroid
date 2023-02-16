@@ -182,13 +182,13 @@ class DispatchTool : Dispatch {
                     if (response.code == 206) {
                         handleResponse(response, task, callback)
                     } else {
-                        handleResult(task, DOWNLOAD_FILE, "不支持断点续传")
+                        handleResult(task, DOWNLOAD_FILE, ERROR_TAG_1)
                     }
                 } else {
                     if (response.code == 200) {
                         handleResponse(response, task, callback)
                     } else {
-                        handleResult(task, DOWNLOAD_FILE, "response.code() = ${response.code}")
+                        handleResult(task, DOWNLOAD_FILE, ERROR_TAG_9)
                     }
                 }
             }
@@ -236,13 +236,13 @@ class DispatchTool : Dispatch {
         }
         if (mkSuccess) {
             if (response.body == null) {
-                callback.invoke(DOWNLOAD_FILE, "response.body is null")
+                callback.invoke(DOWNLOAD_FILE, ERROR_TAG_6)
             } else {
                 saveNetStream(response.body!!.byteStream(), file, task, callback)
             }
             response.body?.close()
         } else {
-            callback.invoke(DOWNLOAD_FILE, "创建文件夹失败")
+            callback.invoke(DOWNLOAD_FILE, ERROR_TAG_2)
             response.body?.close()
         }
     }
@@ -267,7 +267,7 @@ class DispatchTool : Dispatch {
                 cur = task.getProgress()
                 if (!TextUtils.isEmpty(task.cancel()) && task.url().equals(task.cancel())) {
                     File(task.path().toString() + ".tmp").delete()
-                    callback.invoke(DOWNLOAD_FILE, "下载任务被主动取消")
+                    callback.invoke(DOWNLOAD_FILE, ERROR_TAG_3)
                     return
                 } else {
                     if (cur != pre) {
@@ -275,7 +275,7 @@ class DispatchTool : Dispatch {
                             if (needCheckMd5(task)) {
                                 if (!checkMd5(task.md5(), file.absolutePath)) {
                                     File(task.path().toString() + ".tmp").delete()
-                                    callback.invoke(DOWNLOAD_FILE, "md5校验失败")
+                                    callback.invoke(DOWNLOAD_FILE, ERROR_TAG_4)
                                     return
                                 }
                             }
@@ -284,7 +284,7 @@ class DispatchTool : Dispatch {
                             if (renameSuccess) {
                                 callback.invoke(DOWNLOAD_SUCCESS, "任务下载成功")
                             } else {
-                                callback.invoke(DOWNLOAD_FILE, "下载任务失败，重命名失败")
+                                callback.invoke(DOWNLOAD_FILE, ERROR_TAG_5)
                             }
                         } else {
                             task.progressCallback()?.onProgress(task)
@@ -295,10 +295,10 @@ class DispatchTool : Dispatch {
             }
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
-            callback.invoke(DOWNLOAD_FILE, "FileNotFoundException: not found file exception")
+            callback.invoke(DOWNLOAD_FILE, ERROR_TAG_7)
         } catch (e: IOException) {
             e.printStackTrace()
-            callback.invoke(DOWNLOAD_FILE, "IOException: io exception")
+            callback.invoke(DOWNLOAD_FILE, ERROR_TAG_8)
         } finally {
             try {
                 out?.close()
