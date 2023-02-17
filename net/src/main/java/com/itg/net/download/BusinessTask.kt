@@ -55,7 +55,7 @@ class BusinessTask : DTask() {
             }
 
             override fun onFail(error: String?, task:Task?) {
-                if (task?.getProgress()?:-1 >0) {
+                if (task?.getProgress()?:-1 >0 && ERROR_TAG_3 != error) {
                     DdNet.instance.callbackMgr.loop(task as DTask)
                     TaskCallbackMgr.instance.loop(task)
                 }
