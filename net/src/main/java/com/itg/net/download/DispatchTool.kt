@@ -266,7 +266,9 @@ class DispatchTool : Dispatch {
                 task.setDownloadSize(file.length())
                 cur = task.getProgress()
                 if (!TextUtils.isEmpty(task.cancel()) && task.url().equals(task.cancel())) {
-//                    File(task.path().toString() + ".tmp").delete()
+                    if (!task.append()) { //如果不支持断点续传，则取消任务时删除下载的部分数据
+                        File(task.path().toString() + ".tmp").delete()
+                    }
                     callback.invoke(DOWNLOAD_FILE, ERROR_TAG_3)
                     return
                 } else {
