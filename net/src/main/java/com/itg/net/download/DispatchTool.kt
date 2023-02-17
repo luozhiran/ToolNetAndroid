@@ -266,7 +266,7 @@ class DispatchTool : Dispatch {
                 task.setDownloadSize(file.length())
                 cur = task.getProgress()
                 if (!TextUtils.isEmpty(task.cancel()) && task.url().equals(task.cancel())) {
-                    File(task.path().toString() + ".tmp").delete()
+//                    File(task.path().toString() + ".tmp").delete()
                     callback.invoke(DOWNLOAD_FILE, ERROR_TAG_3)
                     return
                 } else {

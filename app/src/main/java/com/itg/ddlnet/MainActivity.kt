@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        DdNet.instance.download.setGlobalProgressListener(progress)
+//        DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
 //            task = DdNet.instance.download
 //                .downloadTask()
