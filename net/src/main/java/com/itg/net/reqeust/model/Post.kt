@@ -13,9 +13,19 @@ import okhttp3.Request
 
 class Post : AdapterBuilder() {
     private val urlParams = StringBuilder()
+    private var formToJson = false
 
     fun appendUrl(key: String?, value: String?): Post {
         urlParams.append(key).append("#").append(value).append("$")
+        return this
+    }
+
+    /**
+     * 表单转化成json
+     * @return Post
+     */
+    fun formToJson():Post{
+        formToJson = true
         return this
     }
 
@@ -32,7 +42,7 @@ class Post : AdapterBuilder() {
             return null
         }
         builder.url(url)
-        getRequestBody()?.apply { builder.post(this) }
+        getRequestBody(formToJson)?.apply { builder.post(this) }
         return DdNet.instance.okhttpManager.okHttpClient.newCall(builder.build())
     }
 

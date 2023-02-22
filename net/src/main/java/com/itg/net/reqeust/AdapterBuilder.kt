@@ -6,6 +6,7 @@ import android.os.Handler
 import android.os.Message
 import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
+import com.itg.net.DdNet.Companion.MEDIA_JSON
 import com.itg.net.base.Builder
 import com.itg.net.base.DdCallback
 import com.itg.net.reqeust.body.IntervalBody
@@ -15,6 +16,7 @@ import okhttp3.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import org.json.JSONObject
 import java.io.File
 import java.io.IOException
 
@@ -219,7 +221,9 @@ abstract class AdapterBuilder : Builder {
     }
 
 
-    fun getRequestBody(): RequestBody? {
+
+
+    fun getRequestBody(formToJson:Boolean = false): RequestBody? {
         if (intervalFile != null) {
             val requestBody = getIntervalBody()
             if (requestBody != null) return requestBody
@@ -234,7 +238,11 @@ abstract class AdapterBuilder : Builder {
         ) {
             getUpdateFileRequestBody(files?.get(0))
         } else if (!formParams.isNullOrEmpty() && contents.isNullOrEmpty() && files.isNullOrEmpty()) {
-            getFromBody(formParams)
+            if (formToJson) {
+                getUpdateStringRequestBody(MEDIA_JSON,formToJson(formParams))
+            } else {
+                getFromBody(formParams)
+            }
         } else {
             getMultipartBody(formParams)
         }
@@ -246,6 +254,18 @@ abstract class AdapterBuilder : Builder {
         builder.addFile(intervalFile)
         builder.addFileOffset(intervalOffset)
         return builder.build()
+    }
+
+    private fun formToJson(formParams:StringBuilder):String{
+        val formParamsArray = formParams.split("$")
+        val json = JSONObject()
+        formParams.forEach { str->
+            val array = str.toString().split("#")
+            if (array.size>1) {
+                json.put(array[0],array[1])
+            }
+        }
+        return json.toString()
     }
 
     private fun getFileType(fileName: String): MediaType? {
@@ -421,6 +441,7 @@ abstract class AdapterBuilder : Builder {
             activity = null
         }
     }
+
 
     private fun finally(){
         unregisterEvent()

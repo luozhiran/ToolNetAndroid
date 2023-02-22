@@ -133,6 +133,9 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.post).setOnClickListener {
             DdNet.instance.post()
                 .url("")
+                .addParam("fad","fdasf")
+                .asType<Post>()
+                .formToJson()
                 .autoCancel(this)
                 .send(object :DdCallback{
                     override fun onFailure(er: String?) {
