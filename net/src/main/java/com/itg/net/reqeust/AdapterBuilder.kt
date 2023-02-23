@@ -259,8 +259,8 @@ abstract class AdapterBuilder : Builder {
     private fun formToJson(formParams:StringBuilder):String{
         val formParamsArray = formParams.split("$")
         val json = JSONObject()
-        formParams.forEach { str->
-            val array = str.toString().split("#")
+        formParamsArray.forEach { str->
+            val array = str.split("#")
             if (array.size>1) {
                 json.put(array[0],array[1])
             }

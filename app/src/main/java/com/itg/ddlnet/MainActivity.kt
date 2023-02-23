@@ -132,7 +132,7 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.post).setOnClickListener {
             DdNet.instance.post()
-                .url("")
+                .url("https://www.baidu.com")
                 .addParam("fad","fdasf")
                 .asType<Post>()
                 .formToJson()
