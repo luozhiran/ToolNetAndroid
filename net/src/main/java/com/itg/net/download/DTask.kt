@@ -88,7 +88,7 @@ abstract class DTask : Task {
 
     override fun md5() = tMd5
 
-    fun md5(md5: String): BusinessTask {
+    fun md5(md5: String?): BusinessTask {
         tMd5 = md5
         return this as BusinessTask
     }

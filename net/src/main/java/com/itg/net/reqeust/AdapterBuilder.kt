@@ -12,7 +12,9 @@ import com.itg.net.base.DdCallback
 import com.itg.net.reqeust.body.IntervalBody
 import com.itg.net.reqeust.body.IntervalBodyBuilder
 import com.itg.net.reqeust.castration.IntervalFileCastrationBuilder
+import com.itg.net.reqeust.castration.JsonCastrationBuilder
 import okhttp3.*
+import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.asRequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -41,6 +43,7 @@ abstract class AdapterBuilder : Builder {
     var intervalFile: File? = null
     var cookies: String? = null
     var tag: String? = null
+    var json:String?=null
 
     private val lifeObservable by lazy { MyLifecycleEventObserver()}
 
@@ -120,6 +123,11 @@ abstract class AdapterBuilder : Builder {
         this.contentNames?.add(contentFlag)
         this.contentMediaTypes?.add(mediaType)
         return this
+    }
+
+    override fun addJson(json: String?): JsonCastrationBuilder {
+        this.json = json
+        return JsonCastrationBuilder(this)
     }
 
     /**
@@ -228,6 +236,10 @@ abstract class AdapterBuilder : Builder {
             val requestBody = getIntervalBody()
             if (requestBody != null) return requestBody
         }
+        if (json?.isNotBlank() == true) {
+            return json!!.toRequestBody("application/json;charset=utf-8".toMediaType());
+        }
+
         val formParams = mergeParam(params)
         return if (contents.orEmpty()
                 .isNotEmpty() && formParams.isNullOrBlank() && files.isNullOrEmpty()
