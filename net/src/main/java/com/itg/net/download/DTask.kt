@@ -107,8 +107,9 @@ abstract class DTask : Task {
     override fun extra() = tExtra
 
 
-    fun tryAgainCount(tryAgainCount:Int = 1){
+    fun tryAgainCount(tryAgainCount:Int = 1): BusinessTask {
         tTryAgainCount = tryAgainCount
+        return this as BusinessTask
     }
     override fun tryAgainCount(): Int  = tTryAgainCount
 

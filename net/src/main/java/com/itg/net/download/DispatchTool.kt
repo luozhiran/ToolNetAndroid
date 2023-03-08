@@ -7,6 +7,7 @@ import android.text.TextUtils
 import com.itg.net.DdNet
 import com.itg.net.base.Builder
 import com.itg.net.download.interfaces.Dispatch
+import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.Task
 import okhttp3.Call
 import okhttp3.Callback
@@ -42,14 +43,14 @@ class DispatchTool : Dispatch {
         handler = ReceiverHandler(looper!!) {
             synchronized(lock) {
                 if (it.what == DOWNLOAD_FILE) {
-                    val preTask = it.obj as? DTask?
-                    if (preTask == null) {
+                    val preTask = it.obj as? TempTask?
+                    if (preTask?.task == null) {
                         downloadNextTask()
                     } else {
-                        if (preTask.tryAgainCount() <= 0) {
+                        if (preTask.task.tryAgainCount() <= 0) {
                             downloadNextTask()
                         } else {
-                            tryAgainDownloadTask(preTask)
+                            tryAgainDownloadTask(preTask.task,preTask.iProgressCallback)
                         }
                     }
                 } else {
@@ -82,20 +83,33 @@ class DispatchTool : Dispatch {
     /**
      * 任务有重试次数，在一次上次失败的任务
      */
-    private fun tryAgainDownloadTask(preTask: DTask) {
+    private fun tryAgainDownloadTask(preTask: DTask,progressCallback:IProgressCallback?) {
         synchronized(lock) {
-            if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
+            progressCallback?.let {
+                //把外部的回调还原给任务
+                TaskCallbackMgr.instance.setProgressCallback(preTask,it)
+            }
+            if (mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
                 if (preTask.append()) {
-                    appendDownload(preTask)
+                    appendDownload(preTask,true)
                 } else {
-                    download(preTask)
+                    download(preTask,true)
                 }
             }
         }
     }
 
     override fun download(task: DTask) {
-        if (downloadQueueNoTask(task)) {
+        download(task,false)
+    }
+
+    /**
+     *
+     * @param task DTask
+     * @param tryAgainDownload Boolean 重试下载任务
+     */
+    private fun download(task: DTask,tryAgainDownload:Boolean = false){
+        if (downloadQueueNoTask(task) || tryAgainDownload) {
             task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             sendDownloadRequest(task, null) { type, tag ->
@@ -107,7 +121,16 @@ class DispatchTool : Dispatch {
     }
 
     override fun appendDownload(task: DTask) {
-        if (downloadQueueNoTask(task)) {
+        appendDownload(task,false)
+    }
+
+    /**
+     *
+     * @param task DTask
+     * @param tryAgainDownload Boolean 重试下载任务
+     */
+    private fun appendDownload(task: DTask,tryAgainDownload:Boolean = false) {
+        if (downloadQueueNoTask(task) || tryAgainDownload) {
             task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             getBuilder(task, null).send(object : Callback {
@@ -189,7 +212,7 @@ class DispatchTool : Dispatch {
     @Synchronized
     fun downloadQueueNoTask(task: DTask): Boolean {
         if (task.url().equals(task.cancel())) {
-            sendMsg(task, CANCEL_TASK)
+            sendMsg(TempTask(task,null), CANCEL_TASK)
             return false
         }
         if (!taskQueueHasTask(task) && !runningQueueHasTask(task)) {
@@ -243,12 +266,19 @@ class DispatchTool : Dispatch {
             mRunningTasksUrl.remove(task.url())
             mRunningTasks.remove(task)
         }
+        var tempOuterIProgressCallback:IProgressCallback? = null
         if (type == DOWNLOAD_FILE) {
+            //如果重试次数没有用完，需要保存一个回到最外层的应用，在重试下载开始后，置空这个回调
+             tempOuterIProgressCallback = if (task.tryAgainCount() >0) {
+                 TaskCallbackMgr.instance.getRemoveProgressCallback(task)
+            } else {
+                null
+            }
             task.progressCallback()?.onFail(tag, task)
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
-        sendMsg(task, type)
+        sendMsg(TempTask(task,tempOuterIProgressCallback), type)
     }
 
     private fun getBuilder(task: DTask, header: String?): Builder {
@@ -413,7 +443,7 @@ class DispatchTool : Dispatch {
         }
     }
 
-    private fun sendMsg(task: Task?, type: Int) {
+    private fun sendMsg(task: TempTask?, type: Int) {
         val msg = Message.obtain()
         msg.obj = task
         msg.what = type

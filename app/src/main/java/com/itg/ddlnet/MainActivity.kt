@@ -89,6 +89,7 @@ class MainActivity : AppCompatActivity() {
                 .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
                 .autoCancel(this)
                 .append(true)
+                .tryAgainCount(3)
                 .md5("000k")
                 .prepareEnd()
                 .setProgressListener(object : IProgressCallback{
