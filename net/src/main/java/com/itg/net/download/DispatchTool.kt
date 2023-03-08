@@ -95,7 +95,7 @@ class DispatchTool : Dispatch {
     }
 
     override fun download(task: DTask) {
-        if (isDownload(task)) {
+        if (downloadQueueNoTask(task)) {
             task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             sendDownloadRequest(task, null) { type, tag ->
@@ -107,7 +107,7 @@ class DispatchTool : Dispatch {
     }
 
     override fun appendDownload(task: DTask) {
-        if (isDownload(task)) {
+        if (downloadQueueNoTask(task)) {
             task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             getBuilder(task, null).send(object : Callback {
@@ -187,7 +187,7 @@ class DispatchTool : Dispatch {
 
 
     @Synchronized
-    fun isDownload(task: DTask): Boolean {
+    fun downloadQueueNoTask(task: DTask): Boolean {
         if (task.url().equals(task.cancel())) {
             sendMsg(task, CANCEL_TASK)
             return false
