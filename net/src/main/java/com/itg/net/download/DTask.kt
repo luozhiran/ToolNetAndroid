@@ -18,6 +18,7 @@ abstract class DTask : Task {
     private var tComponentName: String? = null
     private var tCostomBroadcast: String? = null
     private var tExtra: String? = null
+    private var tTryAgainCount = 1 //下载重试次数
     val uniqueId = System.currentTimeMillis()
 
     /**
@@ -105,7 +106,14 @@ abstract class DTask : Task {
 
     override fun extra() = tExtra
 
+
+    fun tryAgainCount(tryAgainCount:Int = 1){
+        tTryAgainCount = tryAgainCount
+    }
+    override fun tryAgainCount(): Int  = tTryAgainCount
+
     fun progressCallback() = iProgressCallback
+
 
 
     fun progressBack(callback: IProgressCallback?): BusinessTask? {

@@ -24,4 +24,6 @@ interface Task {
     fun customBroadcast(): String?
 
     fun extra(): String?
+
+    fun tryAgainCount():Int
 }

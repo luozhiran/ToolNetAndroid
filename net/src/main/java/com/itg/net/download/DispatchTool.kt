@@ -41,22 +41,62 @@ class DispatchTool : Dispatch {
         looper = thread.looper
         handler = ReceiverHandler(looper!!) {
             synchronized(lock) {
-                if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
-                    val task = mTaskQueue.removeFirst()
-                    mTaskQueueUrl.removeFirst()
-                    if (task.append()) {
-                        appendDownload(task as DTask)
+                if (it.what == DOWNLOAD_FILE) {
+                    val preTask = it.obj as? DTask?
+                    if (preTask == null) {
+                        downloadNextTask()
                     } else {
-                        download(task as DTask)
+                        if (preTask.tryAgainCount() <= 0) {
+                            downloadNextTask()
+                        } else {
+                            tryAgainDownloadTask(preTask)
+                        }
                     }
+                } else {
+                    downloadNextTask()
                 }
+
             }
             true
         }
     }
 
+
+    /**
+     * 重任务队列中，获取新任务并下载该任务
+     */
+    private fun downloadNextTask() {
+        synchronized(lock) {
+            if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
+                val task = mTaskQueue.removeFirst()
+                mTaskQueueUrl.removeFirst()
+                if (task.append()) {
+                    appendDownload(task as DTask)
+                } else {
+                    download(task as DTask)
+                }
+            }
+        }
+    }
+
+    /**
+     * 任务有重试次数，在一次上次失败的任务
+     */
+    private fun tryAgainDownloadTask(preTask: DTask) {
+        synchronized(lock) {
+            if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
+                if (preTask.append()) {
+                    appendDownload(preTask)
+                } else {
+                    download(preTask)
+                }
+            }
+        }
+    }
+
     override fun download(task: DTask) {
         if (isDownload(task)) {
+            task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             sendDownloadRequest(task, null) { type, tag ->
                 handleResult(task, type, tag)
@@ -68,6 +108,7 @@ class DispatchTool : Dispatch {
 
     override fun appendDownload(task: DTask) {
         if (isDownload(task)) {
+            task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             getBuilder(task, null).send(object : Callback {
                 override fun onFailure(call: Call, e: IOException) {
@@ -98,7 +139,7 @@ class DispatchTool : Dispatch {
                 }
 
             }) { call: Call? ->
-                (task as? BusinessTask)?.registerEvent(call,task)
+                (task as? BusinessTask)?.registerEvent(call, task)
             }
         } else {
             needSendDownloadRequest()
@@ -116,8 +157,8 @@ class DispatchTool : Dispatch {
     }
 
 
-   private fun needSendDownloadRequest(){
-        if (mRunningTasksUrl.size == 0&& mTaskQueueUrl.size >0) {
+    private fun needSendDownloadRequest() {
+        if (mRunningTasksUrl.size == 0 && mTaskQueueUrl.size > 0) {
             sendMsg(null, DOWNLOAD_TASK)
         }
     }
@@ -162,7 +203,7 @@ class DispatchTool : Dispatch {
             putTaskToQueue(task)
             return false
         }
-        task.progressCallback()?.onFail("任务已经在下载或者在下载队列",task)
+        task.progressCallback()?.onFail("任务已经在下载或者在下载队列", task)
         return false
     }
 
@@ -193,7 +234,7 @@ class DispatchTool : Dispatch {
                 }
             }
         }) { call: Call? ->
-            (task as? BusinessTask)?.registerEvent(call,task)
+            (task as? BusinessTask)?.registerEvent(call, task)
         }
     }
 
@@ -207,7 +248,7 @@ class DispatchTool : Dispatch {
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
-        sendMsg(null, DOWNLOAD_TASK)
+        sendMsg(task, type)
     }
 
     private fun getBuilder(task: DTask, header: String?): Builder {
@@ -331,7 +372,7 @@ class DispatchTool : Dispatch {
                 return@forEach
             }
         }
-        if (needDeleteTask!=null) {
+        if (needDeleteTask != null) {
             mRunningTasks.remove(needDeleteTask)
             mRunningTasksUrl.remove(needDeleteTask!!.url())
             DdNet.instance.cancelFirstTag(url)

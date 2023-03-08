@@ -5,8 +5,8 @@ const val CANCEL_TASK = 1
 const val DOWNLOAD_TASK = 2
 
 
-const val DOWNLOAD_FILE = 1
-const val DOWNLOAD_SUCCESS = 2
+const val DOWNLOAD_FILE = 3
+const val DOWNLOAD_SUCCESS = 4
 
 const val ERROR_TAG_1 = "不支持断点续传"
 const val ERROR_TAG_2 = "创建文件夹失败"
