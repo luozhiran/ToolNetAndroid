@@ -25,7 +25,7 @@ abstract class DTask : Task {
      * 当前下载任务，如果支持断点续传，append设置为true
      * @param append Boolean
      */
-    fun append(append: Boolean):BusinessTask {
+    fun append(append: Boolean): BusinessTask {
         tAppend = append
         return this as BusinessTask
     }
@@ -43,7 +43,7 @@ abstract class DTask : Task {
 
     override fun getDownloadSize() = rDownloadSize
 
-    fun setDownloadSize(size:Long){
+    fun setDownloadSize(size: Long) {
         rDownloadSize = size
     }
 
@@ -107,14 +107,14 @@ abstract class DTask : Task {
     override fun extra() = tExtra
 
 
-    fun tryAgainCount(tryAgainCount:Int = 1): BusinessTask {
+    fun tryAgainCount(tryAgainCount: Int = 1): BusinessTask {
         tTryAgainCount = tryAgainCount
         return this as BusinessTask
     }
-    override fun tryAgainCount(): Int  = tTryAgainCount
+
+    override fun tryAgainCount(): Int = tTryAgainCount
 
     fun progressCallback() = iProgressCallback
-
 
 
     fun progressBack(callback: IProgressCallback?): BusinessTask? {

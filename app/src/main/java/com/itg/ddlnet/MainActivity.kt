@@ -88,9 +88,9 @@ class MainActivity : AppCompatActivity() {
                 .path("${filesDir}/android.index.bundle.zip")
                 .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
                 .autoCancel(this)
-                .append(true)
-                .tryAgainCount(3)
+                .append(false)
                 .md5("000k")
+                .tryAgainCount(3)
                 .prepareEnd()
                 .setProgressListener(object : IProgressCallback{
                     override fun onConnecting(task: Task?) {
@@ -98,10 +98,10 @@ class MainActivity : AppCompatActivity() {
                     }
 
                     override fun onProgress(task: Task?) {
-                        if (task?.getProgress() == 40 && stop) {
-                            stop = false
-                            DdNet.instance.download.cancel("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
-                        }
+//                        if (task?.getProgress() == 40 && stop) {
+//                            stop = false
+//                            DdNet.instance.download.cancel("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
+//                        }
                         Log.e("MainActivity","onProgress:"+task?.getProgress())
                     }
 

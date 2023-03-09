@@ -113,7 +113,7 @@ class DispatchTool : Dispatch {
      * @param tryAgainDownload Boolean 重试下载任务
      */
     private fun download(task: DTask, tryAgainDownload: Boolean = false) {
-        if (downloadQueueNoTask(task) || tryAgainDownload) {
+        if (tryAgainDownload ||downloadQueueNoTask(task)) {
             task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             sendDownloadRequest(task, null) { type, tag ->
@@ -134,7 +134,7 @@ class DispatchTool : Dispatch {
      * @param tryAgainDownload Boolean 重试下载任务
      */
     private fun appendDownload(task: DTask, tryAgainDownload: Boolean = false) {
-        if (downloadQueueNoTask(task) || tryAgainDownload) {
+        if (tryAgainDownload || downloadQueueNoTask(task)) {
             task.tryAgainCount(task.tryAgainCount() - 1)
             task.progressCallback()?.onConnecting(task)
             getBuilder(task, null).send(object : Callback {
