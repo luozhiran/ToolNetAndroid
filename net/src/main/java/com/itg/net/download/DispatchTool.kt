@@ -420,6 +420,7 @@ class DispatchTool : Dispatch {
 
     fun cancelTask(task: Task?) {
         if (task == null) return
+        task.cancel(task.url())
         mTaskQueue.remove(task)
         mTaskQueueUrl.remove(task.url())
         mRunningTasks.remove(task).let {
