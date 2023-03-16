@@ -7,7 +7,6 @@ import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
 import com.itg.net.reqeust.MyLifecycleEventObserver
-import com.itg.net.reqeust.model.post.file.PostFile
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request

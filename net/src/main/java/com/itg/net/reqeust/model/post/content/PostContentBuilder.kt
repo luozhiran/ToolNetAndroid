@@ -18,10 +18,10 @@ abstract class PostContentBuilder : ParamsBuilder() {
         contentNames = mutableListOf()
     }
 
-    fun addContent1(content: String?, mediaType: String?): PostContentBuilder =
+   internal fun addContent1(content: String?, mediaType: String?): PostContentBuilder =
         addContent1(content, "", mediaType)
 
-    fun addContent1(
+   internal fun addContent1(
         content: String?,
         contentFlag: String?,
         mediaType: String?
