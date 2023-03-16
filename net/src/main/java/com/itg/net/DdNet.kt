@@ -3,34 +3,25 @@ package com.itg.net
 import com.itg.net.download.CallbackMgr
 import com.itg.net.reqeust.create
 import com.itg.net.reqeust.model.get.Get
-import com.itg.net.reqeust.model.post.Post
+import com.itg.net.reqeust.model.post.multipart.PostMul
 import com.itg.net.reqeust.model.params.ParamsBuilder
+import com.itg.net.reqeust.model.post.content.PostContent
+import com.itg.net.reqeust.model.post.file.PostFile
+import com.itg.net.reqeust.model.post.form.PostForm
+import com.itg.net.reqeust.model.post.json.PostJson
 import java.lang.Exception
 
 
+const val MEDIA_JSON = "application/json; charset=utf-8"
+
+const val MEDIA_OCTET_STREAM = "application/octet-stream"
+
+const val BROAD_ACTION = "com.yqtec.install.broadcast"
+
+enum class ModeType{PostFile,PostForm,PostJson,PostMul,Get,PostResume,PostContent}
 class DdNet {
 
     companion object {
-        @JvmStatic
-        val GET = 1
-
-        @JvmStatic
-        val POST = 2
-
-        @JvmStatic
-        val DELETE = 3
-
-        @JvmStatic
-        val PUT = 4
-
-        @JvmStatic
-        val MEDIA_JSON = "application/json; charset=utf-8"
-
-        @JvmStatic
-        val MEDIA_OCTET_STREAM = "application/octet-stream"
-
-        @JvmStatic
-        val BROAD_ACTION = "com.yqtec.install.broadcast"
 
         @JvmStatic
         val instance: DdNet by lazy { DdNet() }
@@ -41,18 +32,21 @@ class DdNet {
     val download: Download by lazy { Download() }
     val callbackMgr: CallbackMgr by lazy { CallbackMgr() }
 
-    fun builder(type: Int): ParamsBuilder {
+    fun builder(type: ModeType): ParamsBuilder {
         return create(type) ?: throw Exception("dot support $type")
     }
 
-    fun get() = builder(GET) as Get
+    fun get() = builder(ModeType.Get) as Get
 
-    fun post() = builder(POST) as Post
+    fun postMultipart() = builder(ModeType.PostMul) as PostMul
 
-//    fun put() = builder(PUT) as Put
+    fun postFile() = builder(ModeType.PostFile) as PostFile
 
-//    fun delete() = builder(DELETE) as Delete
+    fun postForm() = builder(ModeType.PostForm) as PostForm
 
+    fun postJson() = builder(ModeType.PostJson) as PostJson
+
+    fun postContent() = builder(ModeType.PostContent) as PostContent
 
 
     fun cancelAll() {

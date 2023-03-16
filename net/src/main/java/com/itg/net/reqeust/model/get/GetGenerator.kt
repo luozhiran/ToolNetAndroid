@@ -5,8 +5,8 @@ import com.itg.net.reqeust.model.params.ParamsBuilder
 import com.itg.net.reqeust.model.params.SentBuilder
 import okhttp3.Cookie
 
-abstract class GetGenerator: ParamsBuilder(), SentBuilder {
-
+abstract class GetGenerator: ParamsBuilder(), SentBuilder,GetBuilder {
+    protected val params = StringBuilder()
     protected var activity: Activity? = null
 
     override fun autoCancel(activity: Activity?): GetGenerator {
@@ -14,14 +14,17 @@ abstract class GetGenerator: ParamsBuilder(), SentBuilder {
         return this;
     }
 
-
     override fun addParam(key: String?, value: String?): GetGenerator {
-        super.addParam(key, value)
+        if (key.isNullOrBlank() || value.isNullOrBlank())  return this
+        params.append(key).append("#").append(value).append("$")
         return this
     }
 
     override fun addParam(map: MutableMap<String, String?>?): GetGenerator {
-        super.addParam(map)
+        if (map.isNullOrEmpty()) return this
+        map.forEach { entry ->
+            addParam(entry.key, entry.value)
+        }
         return this
     }
 

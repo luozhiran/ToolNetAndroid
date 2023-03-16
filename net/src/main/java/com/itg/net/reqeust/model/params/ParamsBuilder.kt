@@ -5,10 +5,10 @@ import com.itg.net.DdNet
 import com.itg.net.base.Builder
 import okhttp3.Cookie
 import okhttp3.Headers
+import org.json.JSONObject
 
 /**
  * 处理基础参数,post put delete get 所有共同需要的参数
- * @property call_is_null_msg String
  * @property url String?
  * @property headerSb StringBuilder
  * @property params StringBuilder
@@ -16,28 +16,11 @@ import okhttp3.Headers
  * @property tag String?
  * @property json String?
  */
-abstract class ParamsBuilder: Builder,SentBuilder{
-    private val call_is_null_msg = "url is error,please check url"
+abstract class ParamsBuilder : Builder, SentBuilder {
     var url: String? = DdNet.instance.ddNetConfig.url
     private val headerSb = StringBuilder()
-    protected val params = StringBuilder()
     var cookies: String? = null
     var tag: String? = null
-
-
-    override fun addParam(key: String?, value: String?): ParamsBuilder {
-        if (key.isNullOrBlank() || value.isNullOrBlank())  return this
-        params.append(key).append("#").append(value).append("$")
-        return this
-    }
-
-    override fun addParam(map: MutableMap<String, String?>?): ParamsBuilder {
-        if (map.isNullOrEmpty()) return this
-        map.forEach { entry ->
-            addParam(entry.key, entry.value)
-        }
-        return this
-    }
 
     override fun addHeader(key: String?, value: String?): ParamsBuilder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
@@ -61,7 +44,7 @@ abstract class ParamsBuilder: Builder,SentBuilder{
     override fun addCookie(cookie: Cookie?): ParamsBuilder = addCookie(mutableListOf(cookie))
 
     override fun addCookie(cookie: List<Cookie?>?): ParamsBuilder {
-        if (cookie == null || cookie.isEmpty())  return this
+        if (cookie == null || cookie.isEmpty()) return this
         val cookieHeader = StringBuilder()
         cookie.forEachIndexed { index, value ->
             if (index > 0) {
@@ -81,7 +64,7 @@ abstract class ParamsBuilder: Builder,SentBuilder{
         return this
     }
 
-    fun getHeader(): Headers? {
+    internal fun getHeader(): Headers? {
         val builder: Headers.Builder? =
             if (headerSb.isNotEmpty() || cookies.orEmpty().isNotEmpty()) {
                 Headers.Builder()
@@ -106,43 +89,55 @@ abstract class ParamsBuilder: Builder,SentBuilder{
         }
         return builder.build()
     }
+//
+//    /**
+//     * 过滤参数，把可用参数和全局参数合并，并剔除重复参数
+//     * @param requestParams StringBuilder?
+//     */
+//    internal fun mergeParam(requestParams: StringBuilder?): StringBuilder? {
+//        val globalMap = DdNet.instance.ddNetConfig.globalParams
+//        return if (globalMap.isNotEmpty()) {
+//            val localBuild = StringBuilder()
+//            val params = requestParams.toString()
+//            globalMap.forEach {
+//                val str = it.key + "#" + it.value
+//                if (!params.contains(str)) {
+//                    localBuild.append(str).append("$")
+//                }
+//            }
+//            localBuild.append(requestParams)
+//        } else {
+//            requestParams
+//        }
+//    }
+//
+//    internal fun getParam(requestParams: StringBuilder?): String {
+//        val urlParam = mergeParam(requestParams) ?: return this.url ?: ""
+//        if (urlParam.isNotBlank()) {
+//            val urlBuild = Uri.parse(this.url).buildUpon()
+//            val keyValue = urlParam.toString().split("[$]")
+//            if (keyValue.isEmpty()) return this.url ?: ""
+//            keyValue.forEach { value ->
+//                val s = value.split("#")
+//                if (s.isNotEmpty() && s.size == 2) {
+//                    urlBuild.appendQueryParameter(s[0], s[1])
+//                }
+//            }
+//            this.url = urlBuild.build().toString()
+//        }
+//        return this.url ?: ""
+//    }
 
-    /**
-     * 过滤参数，把可用参数和全局参数合并，并剔除重复参数
-     * @param requestParams StringBuilder?
-     */
-    protected fun mergeParam(requestParams: StringBuilder?): StringBuilder? {
-        val globalMap = DdNet.instance.ddNetConfig.globalParams
-        return if (globalMap.isNotEmpty()) {
-            val localBuild = StringBuilder()
-            val params = requestParams.toString()
-            globalMap.forEach {
-                val str = it.key + "#" + it.value
-                if (!params.contains(str)) {
-                    localBuild.append(str).append("$")
-                }
+    private fun formToJson(formParams: StringBuilder): String {
+        val formParamsArray = formParams.split("$")
+        val json = JSONObject()
+        formParamsArray.forEach { str ->
+            val array = str.split("#")
+            if (array.size > 1) {
+                json.put(array[0], array[1])
             }
-            localBuild.append(requestParams)
-        } else {
-            requestParams
         }
-    }
-
-    fun getParam(urlParams: StringBuilder? = null): String {
-        val urlParam = mergeParam(urlParams ?: params) ?: return this.url ?: ""
-        if (urlParam.isNotBlank()) {
-            val urlBuild = Uri.parse(this.url).buildUpon()
-            val keyValue = urlParam.toString().split("[$]")
-            if (keyValue.isEmpty()) return this.url ?: ""
-            keyValue.forEach { value ->
-                val s = value.split("#")
-                if (s.isNotEmpty() && s.size == 2) {
-                    urlBuild.appendQueryParameter(s[0], s[1])
-                }
-            }
-            this.url = urlBuild.build().toString()
-        }
-        return this.url ?: ""
+        return json.toString()
     }
 
 

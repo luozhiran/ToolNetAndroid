@@ -1,4 +1,4 @@
-package com.itg.net.reqeust.model.get
+package com.itg.net.reqeust.model.post.content
 
 import android.app.Activity
 import android.os.Handler
@@ -13,8 +13,50 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-class Get : GetGenerator() {
+class PostContent:PostContentGenerator() {
     private val lifeObservable by lazy { MyLifecycleEventObserver() }
+    private var activity: Activity? = null
+
+    override fun autoCancel(activity: Activity?): PostContent {
+        this.activity = activity
+        return this
+    }
+
+    private fun registerEvent(call: Call?) {
+        if (call == null) return
+        val tempActivity = (activity as? ComponentActivity)
+        lifeObservable.setCallback {
+            call.cancel()
+            unregisterEvent()
+        }
+        tempActivity?.lifecycle?.addObserver(lifeObservable)
+    }
+
+    private fun unregisterEvent() {
+        val tempActivity = (activity as? ComponentActivity)
+        tempActivity?.runOnUiThread {
+            tempActivity.lifecycle.removeObserver(lifeObservable)
+            activity = null
+        }
+    }
+
+
+    private fun createCall():Call?{
+        val builder = Request.Builder()
+        getHeader()?.apply { builder.headers(this) }
+        val url = getUrl()
+        if (tag.isNullOrEmpty()) {
+            builder.tag(url)
+        } else {
+            builder.tag(tag)
+        }
+        if (url.isBlank()) {
+            return null
+        }
+        builder.url(url)
+        getRequestBody()?.apply { builder.post(this) }
+        return DdNet.instance.okhttpManager.okHttpClient.newCall(builder.build())
+    }
 
     override fun send(callback: DdCallback?) {
         val call = createCall()
@@ -77,42 +119,5 @@ class Get : GetGenerator() {
             call.enqueue(response)
         }
     }
-
-    private fun createCall(): Call? {
-        val builder = Request.Builder()
-        getHeader()?.apply { builder.headers(this) }
-        val url = getParam(params)
-        if (tag.isNullOrEmpty()) {
-            builder.tag(url)
-        } else {
-            builder.tag(tag)
-        }
-        if (url.isBlank()) {
-            return null
-        }
-        builder.url(url)
-        builder.get()
-        return DdNet.instance.okhttpManager.okHttpClient.newCall(builder.build())
-    }
-
-
-    private fun registerEvent(call: Call?) {
-        if (call == null) return
-        val tempActivity = (activity as? ComponentActivity)
-        lifeObservable.setCallback {
-            call.cancel()
-            unregisterEvent()
-        }
-        tempActivity?.lifecycle?.addObserver(lifeObservable)
-    }
-
-    private fun unregisterEvent() {
-        val tempActivity = (activity as? ComponentActivity)
-        tempActivity?.runOnUiThread {
-            tempActivity.lifecycle.removeObserver(lifeObservable)
-            activity = null
-        }
-    }
-
 
 }

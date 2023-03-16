@@ -1,5 +1,6 @@
-package com.itg.net.reqeust.model.post
+package com.itg.net.reqeust.model.post.multipart
 
+import android.app.Activity
 import android.os.Handler
 import android.os.Message
 import androidx.activity.ComponentActivity
@@ -12,8 +13,16 @@ import okhttp3.Request
 import okhttp3.Response
 import java.io.IOException
 
-class Post : PostGenerator() {
+class PostMul : PostMulGenerator() {
     private val lifeObservable by lazy { MyLifecycleEventObserver() }
+    private var activity: Activity? = null
+
+
+    override fun autoCancel(activity: Activity?): PostMulGenerator {
+        this.activity = activity
+        return this
+    }
+
 
    private fun registerEvent(call: Call?) {
         if (call == null) return
@@ -38,7 +47,7 @@ class Post : PostGenerator() {
     private fun createCall(): Call? {
         val builder = Request.Builder()
         getHeader()?.apply { builder.headers(this) }
-        val url = getParam(urlParams)
+        val url = getUrl()
         if (tag.isNullOrEmpty()) {
             builder.tag(url)
         } else {
@@ -48,7 +57,7 @@ class Post : PostGenerator() {
             return null
         }
         builder.url(url)
-        getRequestBody(formToJson)?.apply { builder.post(this) }
+        getRequestBody()?.apply { builder.post(this) }
         return DdNet.instance.okhttpManager.okHttpClient.newCall(builder.build())
     }
 

@@ -129,9 +129,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
-            DdNet.instance.post()
+            DdNet.instance.postMultipart()
                 .url("https://www.baidu.com")
-                .addJson("")
                 .autoCancel(this)
                 .send(object :DdCallback{
                     override fun onFailure(er: String?) {
