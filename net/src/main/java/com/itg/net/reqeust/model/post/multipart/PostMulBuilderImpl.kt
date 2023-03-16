@@ -60,7 +60,7 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
         }
     }
     private val postForm:PostFormBuilder by lazy { object : PostFormBuilder(){
-        override fun autoCancel(activity: Activity?): Builder = this
+        override fun autoCancel(activity: Activity?): PostFormBuilder = this
         override fun send(callback: DdCallback?) {}
         override fun send(handler: Handler?, what: Int, errorWhat: Int) {}
         override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {}
