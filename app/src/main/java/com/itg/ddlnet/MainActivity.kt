@@ -8,9 +8,6 @@ import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.Task
-import com.itg.net.reqeust.model.Get
-import com.itg.net.reqeust.model.Post
-import java.io.File
 
 class MainActivity : AppCompatActivity() {
     var task:Task?=null

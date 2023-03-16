@@ -4,6 +4,7 @@ import android.app.Activity
 import android.os.Handler
 import com.itg.net.base.Builder
 import com.itg.net.base.DdCallback
+import com.itg.net.reqeust.model.params.SentBuilder
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Cookie
@@ -13,7 +14,7 @@ import okhttp3.Cookie
  * @property builder Builder
  * @constructor
  */
-class IntervalFileCastrationBuilder(private val builder: Builder){
+class IntervalFileCastrationBuilder(private val builder: Builder,private val sender: SentBuilder){
     fun addHeader(key: String?, value: String?): IntervalFileCastrationBuilder {
         builder.addHeader(key,value)
         return this
@@ -27,14 +28,14 @@ class IntervalFileCastrationBuilder(private val builder: Builder){
         return this
     }
     fun send(callback: DdCallback?){
-        builder.send(callback)
+        sender.send(callback)
 
     }
     fun send(handler: Handler?, what: Int, errorWhat: Int){
-        builder.send(handler,what,errorWhat)
+        sender.send(handler,what,errorWhat)
     }
     fun send(response: Callback?,callback:((Call?)->Unit)?){
-        builder.send(response,callback)
+        sender.send(response,callback)
     }
     fun addCookie(cookie: Cookie?): IntervalFileCastrationBuilder {
         builder.addCookie(cookie)

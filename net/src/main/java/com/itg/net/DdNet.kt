@@ -1,14 +1,11 @@
 package com.itg.net
 
-import com.itg.net.base.Builder
 import com.itg.net.download.CallbackMgr
 import com.itg.net.reqeust.create
-import com.itg.net.reqeust.model.Delete
-import com.itg.net.reqeust.model.Get
-import com.itg.net.reqeust.model.Post
-import com.itg.net.reqeust.model.Put
+import com.itg.net.reqeust.model.get.Get
+import com.itg.net.reqeust.model.post.Post
+import com.itg.net.reqeust.model.params.ParamsBuilder
 import java.lang.Exception
-import java.util.*
 
 
 class DdNet {
@@ -44,7 +41,7 @@ class DdNet {
     val download: Download by lazy { Download() }
     val callbackMgr: CallbackMgr by lazy { CallbackMgr() }
 
-    fun builder(type: Int): Builder {
+    fun builder(type: Int): ParamsBuilder {
         return create(type) ?: throw Exception("dot support $type")
     }
 
@@ -52,9 +49,9 @@ class DdNet {
 
     fun post() = builder(POST) as Post
 
-    fun put() = builder(PUT) as Put
+//    fun put() = builder(PUT) as Put
 
-    fun delete() = builder(DELETE) as Delete
+//    fun delete() = builder(DELETE) as Delete
 
 
 

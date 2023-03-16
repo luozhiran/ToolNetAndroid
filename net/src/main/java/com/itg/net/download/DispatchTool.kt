@@ -5,10 +5,10 @@ import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
 import com.itg.net.DdNet
-import com.itg.net.base.Builder
 import com.itg.net.download.interfaces.Dispatch
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.Task
+import com.itg.net.reqeust.model.params.ParamsBuilder
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
@@ -290,7 +290,7 @@ class DispatchTool : Dispatch {
         sendMsg(TempTask(task, tempOuterIProgressCallback), type)
     }
 
-    private fun getBuilder(task: DTask, header: String?): Builder {
+    private fun getBuilder(task: DTask, header: String?): ParamsBuilder {
         val builder = DdNet.instance.builder(DdNet.GET).url(task.url())
         header?.apply { builder.addHeader("RANGE", "bytes=$header") }
         task.param?.onEach { value ->
