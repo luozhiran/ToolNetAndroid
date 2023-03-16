@@ -56,7 +56,7 @@ abstract class PostJsonBuilder : ParamsBuilder() {
         val urlParam = mergeParam(urlParams) ?: return this.url ?: ""
         if (urlParam.isNotBlank()) {
             val urlBuild = Uri.parse(this.url).buildUpon()
-            val keyValue = urlParam.toString().split("[$]")
+            val keyValue = urlParam.toString().split("$")
             if (keyValue.isEmpty()) return this.url ?: ""
             keyValue.forEach { value ->
                 val s = value.split("#")
