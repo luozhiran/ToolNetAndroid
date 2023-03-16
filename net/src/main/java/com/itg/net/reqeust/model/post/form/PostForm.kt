@@ -54,7 +54,7 @@ class PostForm:PostFormBuilder() {
             return null
         }
         builder.url(url)
-        getRequestBody().apply { builder.post(this) }
+        getRequestBody()?.apply { builder.post(this) }
         return DdNet.instance.okhttpManager.okHttpClient.newCall(builder.build())
     }
 

@@ -5,6 +5,7 @@ import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
 import com.itg.net.DdNet
+import com.itg.net.ModeType
 import com.itg.net.download.interfaces.Dispatch
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.Task
@@ -291,7 +292,7 @@ class DispatchTool : Dispatch {
     }
 
     private fun getBuilder(task: DTask, header: String?): ParamsBuilder {
-        val builder = DdNet.instance.builder(DdNet.GET).url(task.url())
+        val builder = DdNet.instance.builder(ModeType.Get).url(task.url())
         header?.apply { builder.addHeader("RANGE", "bytes=$header") }
         task.param?.onEach { value ->
             builder.addHeader(value.key, value.value)

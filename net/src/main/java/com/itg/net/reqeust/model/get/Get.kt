@@ -81,7 +81,7 @@ class Get : GetGenerator() {
     private fun createCall(): Call? {
         val builder = Request.Builder()
         getHeader()?.apply { builder.headers(this) }
-        val url = getParam(params)
+        val url = getUrl()
         if (tag.isNullOrEmpty()) {
             builder.tag(url)
         } else {

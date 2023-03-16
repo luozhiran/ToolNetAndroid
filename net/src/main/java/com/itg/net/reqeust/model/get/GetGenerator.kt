@@ -1,6 +1,8 @@
 package com.itg.net.reqeust.model.get
 
 import android.app.Activity
+import android.net.Uri
+import com.itg.net.DdNet
 import com.itg.net.reqeust.model.params.ParamsBuilder
 import com.itg.net.reqeust.model.params.SentBuilder
 import okhttp3.Cookie
@@ -58,6 +60,43 @@ abstract class GetGenerator: ParamsBuilder(), SentBuilder,GetBuilder {
         return this
     }
 
+    /**
+     * 把urlParams放到url的后面
+     *
+     */
+    internal fun mergeParam(sb:StringBuilder): StringBuilder {
+        val globalMap = DdNet.instance.ddNetConfig.globalParams
+        return if (globalMap.isNotEmpty()) {
+            val localBuild = StringBuilder()
+            val params = sb.toString()
+            globalMap.forEach {
+                val str = it.key + "#" + it.value
+                if (!params.contains(str)) {
+                    localBuild.append(str).append("$")
+                }
+            }
+            localBuild.append(params)
+        } else {
+            sb
+        }
+    }
+
+    internal fun getUrl(): String {
+        val urlParam = mergeParam(params) ?: return this.url ?: ""
+        if (urlParam.isNotBlank()) {
+            val urlBuild = Uri.parse(this.url).buildUpon()
+            val keyValue = urlParam.toString().split("$")
+            if (keyValue.isEmpty()) return this.url ?: ""
+            keyValue.forEach { value ->
+                val s = value.split("#")
+                if (s.isNotEmpty() && s.size == 2) {
+                    urlBuild.appendQueryParameter(s[0], s[1])
+                }
+            }
+            this.url = urlBuild.build().toString()
+        }
+        return this.url ?: ""
+    }
 
 
 }

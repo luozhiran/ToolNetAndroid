@@ -5,6 +5,7 @@ import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import androidx.activity.ComponentActivity
+import com.itg.net.BROAD_ACTION
 import com.itg.net.DdNet
 import com.itg.net.Download
 import com.itg.net.base.Builder
@@ -39,7 +40,7 @@ class BusinessTask : DTask() {
                 if (task.customBroadcast().orEmpty().isNotBlank()) {
                     intent = Intent(task.customBroadcast())
                 } else if (task.broadcast()) {
-                    intent = Intent(DdNet.BROAD_ACTION)
+                    intent = Intent(BROAD_ACTION)
                 }
                 intent?.let {it->
                     if (Build.VERSION.SDK_INT >= 26 && task.broadcastComponentName().orEmpty().isNotBlank()) {

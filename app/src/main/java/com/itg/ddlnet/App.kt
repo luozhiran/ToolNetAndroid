@@ -10,6 +10,8 @@ class App:Application() {
         
         DdNet.instance.ddNetConfig
             .app(this)
+            .setGlobalParams("ab","bai")
+            .setGlobalParams("43","af")
             .maxDownloadNum(1)
             .useHttpLog(true)
             .url("https://www.baidu.com")
