@@ -75,7 +75,7 @@ abstract class ParamsBuilder : Builder, SentBuilder {
         if (builder == null) return null
         if (headerSb.isNotEmpty()) {
             headerSb.toString()
-                .split("[$]")
+                .split("$")
                 .forEach { value ->
                     val splitStr = value.split("#")
                     if (splitStr.isNotEmpty() && splitStr.size == 2) {
@@ -89,44 +89,6 @@ abstract class ParamsBuilder : Builder, SentBuilder {
         }
         return builder.build()
     }
-//
-//    /**
-//     * 过滤参数，把可用参数和全局参数合并，并剔除重复参数
-//     * @param requestParams StringBuilder?
-//     */
-//    internal fun mergeParam(requestParams: StringBuilder?): StringBuilder? {
-//        val globalMap = DdNet.instance.ddNetConfig.globalParams
-//        return if (globalMap.isNotEmpty()) {
-//            val localBuild = StringBuilder()
-//            val params = requestParams.toString()
-//            globalMap.forEach {
-//                val str = it.key + "#" + it.value
-//                if (!params.contains(str)) {
-//                    localBuild.append(str).append("$")
-//                }
-//            }
-//            localBuild.append(requestParams)
-//        } else {
-//            requestParams
-//        }
-//    }
-//
-//    internal fun getParam(requestParams: StringBuilder?): String {
-//        val urlParam = mergeParam(requestParams) ?: return this.url ?: ""
-//        if (urlParam.isNotBlank()) {
-//            val urlBuild = Uri.parse(this.url).buildUpon()
-//            val keyValue = urlParam.toString().split("[$]")
-//            if (keyValue.isEmpty()) return this.url ?: ""
-//            keyValue.forEach { value ->
-//                val s = value.split("#")
-//                if (s.isNotEmpty() && s.size == 2) {
-//                    urlBuild.appendQueryParameter(s[0], s[1])
-//                }
-//            }
-//            this.url = urlBuild.build().toString()
-//        }
-//        return this.url ?: ""
-//    }
 
     private fun formToJson(formParams: StringBuilder): String {
         val formParamsArray = formParams.split("$")

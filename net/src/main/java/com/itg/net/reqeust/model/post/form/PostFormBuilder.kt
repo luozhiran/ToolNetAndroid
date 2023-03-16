@@ -1,21 +1,23 @@
 package com.itg.net.reqeust.model.post.form
 
+import android.app.Activity
 import android.net.Uri
 import com.itg.net.DdNet
 import com.itg.net.reqeust.model.get.GetBuilder
 import com.itg.net.reqeust.model.params.ParamsBuilder
+import okhttp3.Cookie
 import okhttp3.FormBody
 
 abstract class PostFormBuilder : ParamsBuilder(),GetBuilder {
     private val urlParams = StringBuilder()
-    protected val params = StringBuilder()
+    private val params = StringBuilder()
 
     fun getRequestBody(): FormBody? {
         val formParams = mergeParam(params)
         if (formParams.isBlank()) return null
         val builder = FormBody.Builder()
         if (formParams.isNotEmpty()) {
-            val keyValue = formParams.toString().split("[$]")
+            val keyValue = formParams.toString().split("$")
             if (keyValue.isEmpty()) return null
             keyValue.forEach {
                 val s = it.split("#")
@@ -51,13 +53,15 @@ abstract class PostFormBuilder : ParamsBuilder(),GetBuilder {
         return this
     }
 
-
+    internal fun getParams():java.lang.StringBuilder{
+        return params
+    }
 
     /**
      * 把urlParams放到url的后面
      *
      */
-    internal fun mergeParam(sb:StringBuilder): StringBuilder {
+    private fun mergeParam(sb:StringBuilder): StringBuilder {
         val globalMap = DdNet.instance.ddNetConfig.globalParams
         return if (globalMap.isNotEmpty()) {
             val localBuild = StringBuilder()
@@ -89,5 +93,39 @@ abstract class PostFormBuilder : ParamsBuilder(),GetBuilder {
             this.url = urlBuild.build().toString()
         }
         return this.url ?: ""
+    }
+
+    override fun addHeader(key: String?, value: String?): PostFormBuilder {
+        super.addHeader(key, value)
+        return this
+    }
+
+    override fun addHeader(map: MutableMap<String, String?>?): PostFormBuilder {
+        super.addHeader(map)
+        return this
+    }
+
+    override fun url(url: String?): PostFormBuilder {
+        super.url(url)
+        return this
+    }
+
+    override fun addCookie(cookie: Cookie?): PostFormBuilder {
+         super.addCookie(cookie)
+        return this
+    }
+
+    override fun addCookie(cookie: List<Cookie?>?): PostFormBuilder {
+        super.addCookie(cookie)
+        return this
+    }
+
+    override fun addTag(tag: String?): PostFormBuilder {
+        super.addTag(tag)
+        return this
+    }
+
+    override fun autoCancel(activity: Activity?): PostFormBuilder {
+        return this
     }
 }

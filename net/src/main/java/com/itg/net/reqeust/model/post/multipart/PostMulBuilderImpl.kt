@@ -114,16 +114,9 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
         val builder = MultipartBody.Builder()
         builder.setType(MultipartBody.FORM)
         var hasValue = false
-        val formParams = postForm.mergeParam(postForm.getAppendParams())
-        if (formParams.isNotBlank()) {
-            val keyValue = formParams.toString().split("[$]")
-            keyValue.forEach {
-                val s = it.split("#")
-                if (s.isNotEmpty() && s.size == 2) {
-                    builder.addFormDataPart(s[0], s[1])
-                    hasValue = true
-                }
-            }
+        postForm.getRequestBody()?.let {
+            hasValue = true
+            builder.addPart(it)
         }
         for (index in 0 until postContent.getCount()) {
             val body = postContent.getRequestBody(index)
