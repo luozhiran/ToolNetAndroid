@@ -7,7 +7,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
-internal abstract class PostContentBuilder : ParamsBuilder() {
+abstract class PostContentBuilder : ParamsBuilder() {
     private var contents: MutableList<String?>? = null
     private var contentMediaTypes: MutableList<String?>? = null
     private var contentNames: MutableList<String?>? = null
@@ -17,7 +17,6 @@ internal abstract class PostContentBuilder : ParamsBuilder() {
         contentMediaTypes = mutableListOf()
         contentNames = mutableListOf()
     }
-
    internal fun addContent1(content: String?, mediaType: String?): PostContentBuilder =
         addContent1(content, "", mediaType)
 
@@ -37,16 +36,14 @@ internal abstract class PostContentBuilder : ParamsBuilder() {
         return contents?.get(0)?.toRequestBody(mt)
     }
 
-
-    protected fun getCount():Int {
+    internal fun getCount():Int {
         return this.contents?.size?:0
     }
-
-    protected fun getContentName(index:Int):String{
+    internal fun getContentName(index:Int):String{
         return contentNames?.get(index)?:""
     }
 
-    protected fun getRequestBody(index:Int): RequestBody?{
+    internal fun getRequestBody(index:Int): RequestBody?{
         val mt = contentMediaTypes?.get(index)?.toMediaTypeOrNull()
         return contents?.get(index)?.toRequestBody(mt)
     }
