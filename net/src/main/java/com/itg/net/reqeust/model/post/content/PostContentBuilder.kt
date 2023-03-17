@@ -7,7 +7,7 @@ import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
 
-abstract class PostContentBuilder : ParamsBuilder() {
+internal abstract class PostContentBuilder : ParamsBuilder() {
     private var contents: MutableList<String?>? = null
     private var contentMediaTypes: MutableList<String?>? = null
     private var contentNames: MutableList<String?>? = null
@@ -32,26 +32,26 @@ abstract class PostContentBuilder : ParamsBuilder() {
         return this
     }
 
-    protected fun getRequestBody(): RequestBody? {
+    internal fun getRequestBody(): RequestBody? {
         val mt = contentMediaTypes?.get(0)?.toMediaTypeOrNull()
         return contents?.get(0)?.toRequestBody(mt)
     }
 
 
-    fun getCount():Int {
+    protected fun getCount():Int {
         return this.contents?.size?:0
     }
 
-    fun getContentName(index:Int):String{
+    protected fun getContentName(index:Int):String{
         return contentNames?.get(index)?:""
     }
 
-    fun getRequestBody(index:Int): RequestBody?{
+    protected fun getRequestBody(index:Int): RequestBody?{
         val mt = contentMediaTypes?.get(index)?.toMediaTypeOrNull()
         return contents?.get(index)?.toRequestBody(mt)
     }
 
-    fun addAppendParams(key: String?, value: String?): PostContentBuilder {
+    internal fun addAppendParams(key: String?, value: String?): PostContentBuilder {
         urlParams.append(key).append("#").append(value).append("$")
         return this
     }
@@ -64,7 +64,7 @@ abstract class PostContentBuilder : ParamsBuilder() {
      * 把urlParams放到url的后面
      *
      */
-    internal fun mergeParam(sb:StringBuilder): StringBuilder {
+    private fun mergeParam(sb:StringBuilder): StringBuilder {
         val globalMap = DdNet.instance.ddNetConfig.globalParams
         return if (globalMap.isNotEmpty()) {
             val localBuild = StringBuilder()

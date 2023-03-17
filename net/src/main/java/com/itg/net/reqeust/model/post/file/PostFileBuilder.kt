@@ -36,7 +36,7 @@ abstract class PostFileBuilder : ParamsBuilder() {
         return this
     }
 
-    open fun getRequestBody(): RequestBody? {
+    protected open fun getRequestBody(): RequestBody? {
         return getRequestBody(0)
     }
 
