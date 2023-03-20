@@ -231,7 +231,7 @@ class DispatchTool : Dispatch {
             putTaskToQueue(task)
             return false
         }
-        task.progressCallback()?.onFail("任务已经在下载或者在下载队列", task)
+        task.progressCallback()?.onFail(ERROR_TAG_10, task)
         return false
     }
 
