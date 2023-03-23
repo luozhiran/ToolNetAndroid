@@ -29,9 +29,7 @@ abstract class PostFileGenerator : PostFileBuilder() {
         return this
     }
 
-    override fun autoCancel(activity: Activity?): ParamsBuilder {
-        return this
-    }
+    override fun autoCancel(activity: Activity?): PostFileGenerator =this
 
     override fun addHeader(key: String?, value: String?): ParamsBuilder {
          super.addHeader(key, value)

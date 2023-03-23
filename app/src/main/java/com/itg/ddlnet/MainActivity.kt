@@ -132,6 +132,8 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
+
+
             DdNet.instance.postContent()
                 .url("https://www.baidu.com")
                 .addContent("fadsf", MEDIA_JSON)

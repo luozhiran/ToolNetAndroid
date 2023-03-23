@@ -5,7 +5,7 @@ import okhttp3.Cookie
 
 abstract class PostJsonGenerator:PostJsonBuilder() {
 
-    fun addJson(json:String?): PostJsonGenerator {
+    fun addJson(json:String?): PostJsonBuilder {
         addJson1(json)
         return this
     }

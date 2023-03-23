@@ -1,8 +1,10 @@
 package com.itg.net.reqeust.model.params
 
+import android.app.Activity
 import android.net.Uri
 import com.itg.net.DdNet
 import com.itg.net.base.Builder
+import com.itg.net.reqeust.model.post.file.PostFileGenerator
 import okhttp3.Cookie
 import okhttp3.Headers
 import org.json.JSONObject
@@ -102,5 +104,6 @@ abstract class ParamsBuilder : Builder, SentBuilder {
         return json.toString()
     }
 
+    override fun autoCancel(activity: Activity?): ParamsBuilder =this
 
 }

@@ -1,5 +1,6 @@
 package com.itg.net.reqeust.model.post.json
 
+import android.app.Activity
 import android.net.Uri
 import com.itg.net.DdNet
 import com.itg.net.reqeust.model.params.ParamsBuilder
@@ -13,7 +14,7 @@ abstract class PostJsonBuilder : ParamsBuilder() {
    private var json: String? = null
     private val urlParams = StringBuilder()
 
-    fun addJson1(json:String?): PostJsonBuilder {
+   protected fun addJson1(json:String?): PostJsonBuilder {
         this.json = json
         return this
     }
@@ -68,4 +69,6 @@ abstract class PostJsonBuilder : ParamsBuilder() {
         }
         return this.url ?: ""
     }
+
+    override fun autoCancel(activity: Activity?): PostJsonBuilder = this
 }

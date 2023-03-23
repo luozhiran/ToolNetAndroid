@@ -1,5 +1,6 @@
 package com.itg.net.reqeust.model.post.file
 
+import android.app.Activity
 import android.net.Uri
 import com.itg.net.DdNet
 import com.itg.net.reqeust.model.params.ParamsBuilder
@@ -132,5 +133,7 @@ abstract class PostFileBuilder : ParamsBuilder() {
         }
         return this.url ?: ""
     }
+
+    override fun autoCancel(activity: Activity?): PostFileBuilder =this
 
 }
