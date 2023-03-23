@@ -111,6 +111,26 @@ afterEvaluate {
     }
 }
 
+//task androidSourcesJar(type: Jar) {
+//    // 如果有Kotlin那么就需要打入dir : getSrcDirs
+//    if (project.hasProperty("kotlin")) {
+//        println '====> project kotlin'
+//        from android.sourceSets.main.java.getSrcDirs()
+//        println '====> '+android.sourceSets.main.java.getSrcDirs()
+//    } else if (project.hasProperty("android")) {
+//        println '====> project java'
+//        from android.sourceSets.main.java.sourceFiles
+//    } else {
+//        println '====> project java & kotlin'
+//        from sourceSets.main.allSource
+//    }
+//    classifier = 'sources'
+//}
+//artifacts {
+//    archives androidSourcesJar
+//}
+
+
 //增加自定义代码
 def getRepositoryUrl() {
     if (isReleaseBuild()){
