@@ -9,12 +9,6 @@ import okhttp3.Cookie
 
 abstract class GetGenerator: ParamsBuilder(), SentBuilder,GetBuilder {
     protected val params = StringBuilder()
-    protected var activity: Activity? = null
-
-    override fun autoCancel(activity: Activity?): GetGenerator {
-        this.activity = activity
-        return this;
-    }
 
     override fun addParam(key: String?, value: String?): GetGenerator {
         if (key.isNullOrBlank() || value.isNullOrBlank())  return this
