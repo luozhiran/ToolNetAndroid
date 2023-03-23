@@ -53,7 +53,7 @@ internal class TaskCallbackMgr {
         progressCallbackMap.remove(uniqueId)
     }
 
-    fun getRemoveProgressCallback(task: DTask):IProgressCallback? {
+    fun getProgressCallback(task: DTask):IProgressCallback? {
         val uniqueId = getDownloadCallbackUniqueId(task)
         return progressCallbackMap[uniqueId]
     }

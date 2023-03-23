@@ -269,15 +269,16 @@ class DispatchTool : Dispatch {
     private fun handleResult(task: DTask, type: Int, tag: String) {
         var tempOuterIProgressCallback: IProgressCallback? = null
         var noNeedDeleteRunningQuent = true
+        var tempTag = tag
         if (type == DOWNLOAD_FILE) {
-            //如果重试次数没有用完，需要保存一个回到最外层的应用，在重试下载开始后，置空这个回调
-            tempOuterIProgressCallback = if (task.tryAgainCount() > 0) {
+            if (task.tryAgainCount() > 0) {
+                //如果重试次数没有用完，需要保存一个回到最外层的应用，在重试下载开始后，置空这个回调
                 noNeedDeleteRunningQuent = false
-                TaskCallbackMgr.instance.getRemoveProgressCallback(task)
-            } else {
-                null
+                tempOuterIProgressCallback = TaskCallbackMgr.instance.getProgressCallback(task)
+                // 这里拦截tag，使用 ERROR_TAG_11 替换
+                tempTag = ERROR_TAG_11
             }
-            task.progressCallback()?.onFail(tag, task)
+            task.progressCallback()?.onFail(tempTag, task)
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
