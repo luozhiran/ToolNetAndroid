@@ -14,7 +14,7 @@ abstract class PostJsonBuilder : ParamsBuilder() {
    private var json: String? = null
     private val urlParams = StringBuilder()
 
-   protected fun addJson1(json:String?): PostJsonBuilder {
+   internal fun addJson1(json:String?): PostJsonBuilder {
         this.json = json
         return this
     }

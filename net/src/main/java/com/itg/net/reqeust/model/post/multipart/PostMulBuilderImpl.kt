@@ -33,7 +33,7 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
     private val urlParams = StringBuilder()
     private val postFile: PostFileBuilder by lazy {
         object : PostFileBuilder() {
-            override fun autoCancel(activity: Activity?): Builder = this
+            override fun autoCancel(activity: Activity?): PostFileBuilder = this
 
             override fun send(callback: DdCallback?) {}
 
@@ -43,7 +43,7 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
     }
     private val postJson: PostJsonBuilder by lazy {
         object : PostJsonBuilder() {
-            override fun autoCancel(activity: Activity?): Builder = this
+            override fun autoCancel(activity: Activity?): PostJsonBuilder = this
 
             override fun send(callback: DdCallback?) {}
 
@@ -53,7 +53,7 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
     }
     private val postContent: PostContentBuilder by lazy {
         object : PostContentBuilder() {
-            override fun autoCancel(activity: Activity?): Builder = this
+            override fun autoCancel(activity: Activity?): PostContentBuilder = this
             override fun send(callback: DdCallback?) {}
             override fun send(handler: Handler?, what: Int, errorWhat: Int) {}
             override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {}
