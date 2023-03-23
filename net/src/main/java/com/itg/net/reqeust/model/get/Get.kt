@@ -8,6 +8,7 @@ import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
 import com.itg.net.reqeust.MyLifecycleEventObserver
 import com.itg.net.reqeust.model.base.SendTool
+import com.itg.net.reqeust.model.params.ParamsBuilder
 import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Request
@@ -18,6 +19,7 @@ class Get : GetGenerator() {
     private val sendTool by lazy { SendTool() }
 
     override fun autoCancel(activity: Activity?): Get {
+        super.autoCancel(activity)
         sendTool.autoCancel(activity)
         return this
     }

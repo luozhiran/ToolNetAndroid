@@ -93,4 +93,9 @@ abstract class GetGenerator: ParamsBuilder(), SentBuilder,GetBuilder {
     }
 
 
+    override fun autoCancel(activity: Activity?): GetGenerator {
+        return this
+    }
+
+
 }

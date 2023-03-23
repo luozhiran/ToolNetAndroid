@@ -5,9 +5,11 @@ import android.os.Bundle
 import android.util.Log
 import android.widget.Button
 import com.itg.net.DdNet
+import com.itg.net.MEDIA_JSON
 import com.itg.net.base.DdCallback
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.Task
+import com.itg.net.reqeust.model.get.GetGenerator
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
@@ -132,6 +134,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<Button>(R.id.post).setOnClickListener {
             DdNet.instance.postContent()
                 .url("https://www.baidu.com")
+                .addContent("fadsf", MEDIA_JSON)
                 .autoCancel(this)
                 .send(object :DdCallback{
                     override fun onFailure(er: String?) {

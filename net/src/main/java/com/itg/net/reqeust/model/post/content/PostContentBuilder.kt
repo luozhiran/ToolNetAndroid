@@ -1,7 +1,9 @@
 package com.itg.net.reqeust.model.post.content
 
+import android.app.Activity
 import android.net.Uri
 import com.itg.net.DdNet
+import com.itg.net.base.Builder
 import com.itg.net.reqeust.model.params.ParamsBuilder
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody
@@ -32,6 +34,9 @@ abstract class PostContentBuilder : ParamsBuilder() {
     }
 
     internal fun getRequestBody(): RequestBody? {
+        if (contentMediaTypes == null || contentMediaTypes?.size == 0) {
+            return null
+        }
         val mt = contentMediaTypes?.get(0)?.toMediaTypeOrNull()
         return contents?.get(0)?.toRequestBody(mt)
     }
@@ -94,4 +99,6 @@ abstract class PostContentBuilder : ParamsBuilder() {
         }
         return this.url ?: ""
     }
+
+    override fun autoCancel(activity: Activity?): PostContentBuilder = this
 }

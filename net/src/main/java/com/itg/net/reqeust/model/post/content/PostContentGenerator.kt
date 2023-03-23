@@ -7,7 +7,7 @@ import okhttp3.Cookie
 
 abstract class PostContentGenerator : PostContentBuilder() {
 
-    fun addContent(content: String?, mediaType: String?): PostContentGenerator {
+    fun addContent(content: String?, mediaType: String?): PostContentBuilder {
         super.addContent1(content, mediaType)
         return this
     }

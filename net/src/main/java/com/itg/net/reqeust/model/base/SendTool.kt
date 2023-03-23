@@ -86,6 +86,7 @@ class SendTool {
                 if (!call.isCanceled()) {
                     callback?.onResponse(response.body?.string(), response.code)
                 }
+                response.body?.close()
                 unregisterEvent()
             }
         })
@@ -118,6 +119,7 @@ class SendTool {
                     msg.obj = response.body?.string()
                     handler?.sendMessage(msg)
                 }
+                response.body?.close()
                 unregisterEvent()
             }
         })
