@@ -7,31 +7,42 @@ class CallbackMgr {
     private val progressCallbackList : MutableList<IProgressCallback> by lazy { mutableListOf() }
 
     fun addProgressCallback(progressCallback:IProgressCallback){
-        progressCallbackList.add(progressCallback)
+        synchronized(lock) {
+            progressCallbackList.add(progressCallback)
+        }
     }
 
     fun removeProgressBack(progressCallback:IProgressCallback){
-        progressCallbackList.remove(progressCallback)
+        synchronized(lock) {
+            progressCallbackList.remove(progressCallback)
+        }
     }
 
 
 
     fun loopConnecting(task:DTask){
-        progressCallbackList.forEach {
-            it.onConnecting(task)
+        synchronized(lock) {
+            progressCallbackList.forEach {
+                it.onConnecting(task)
+            }
         }
+
     }
 
     fun loop(task:DTask){
-        progressCallbackList.forEach {
-            it.onProgress(task)
+        synchronized(lock) {
+            progressCallbackList.forEach {
+                it.onProgress(task)
+            }
         }
     }
 
     fun loopFail(msg:String,task: DTask?){
         if (task == null)return
-        progressCallbackList.forEach {
-            it.onFail(msg,task)
+        synchronized(lock) {
+            progressCallbackList.forEach {
+                it.onFail(msg,task)
+            }
         }
     }
 
