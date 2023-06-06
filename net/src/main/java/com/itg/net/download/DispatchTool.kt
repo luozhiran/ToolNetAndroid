@@ -70,13 +70,16 @@ class DispatchTool : Dispatch {
     private fun downloadNextTask() {
         synchronized(lock) {
             if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
-                val task = mTaskQueue.removeFirst()
-                mTaskQueueUrl.removeFirst()
-                if (task.append()) {
-                    appendDownload(task as DTask)
-                } else {
-                    download(task as DTask)
+                if (mTaskQueue.isNotEmpty() && mTaskQueueUrl.isNotEmpty()) {
+                    val task = mTaskQueue.removeFirst()
+                    mTaskQueueUrl.removeFirst()
+                    if (task.append()) {
+                        appendDownload(task as DTask)
+                    } else {
+                        download(task as DTask)
+                    }
                 }
+
             }
         }
     }

@@ -60,8 +60,10 @@ class BusinessTask : DTask() {
                     DdNet.instance.callbackMgr.loop(task as DTask)
                     TaskCallbackMgr.instance.loop(task)
                 }
-                DdNet.instance.callbackMgr.loopFail(error ?: "", task as? DTask?)
-                TaskCallbackMgr.instance.loopFail(error ?: "",task as? DTask?)
+                if (ERROR_TAG_11 != error) { // 重试下载，不抛给业务
+                    DdNet.instance.callbackMgr.loopFail(error ?: "", task as? DTask?)
+                    TaskCallbackMgr.instance.loopFail(error ?: "",task as? DTask?)
+                }
                 unregisterEvent(task)
 
             }
