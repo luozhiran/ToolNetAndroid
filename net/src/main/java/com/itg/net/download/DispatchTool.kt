@@ -231,7 +231,7 @@ class DispatchTool : Dispatch {
             putTaskToQueue(task)
             return false
         }
-        task.progressCallback()?.onFail(ERROR_TAG_10, task)
+//        task.progressCallback()?.onFail(ERROR_TAG_10, task)
         return false
     }
 
@@ -401,10 +401,12 @@ class DispatchTool : Dispatch {
                 return@forEach
             }
         }
-        if (needDeleteTask != null) {
-            mTaskQueue.remove(needDeleteTask)
-            mTaskQueueUrl.remove(needDeleteTask!!.url())
-            return
+        synchronized(lock) {
+            if (needDeleteTask != null) {
+                mTaskQueue.remove(needDeleteTask)
+                mTaskQueueUrl.remove(needDeleteTask!!.url())
+                return
+            }
         }
         mRunningTasks.forEach {
             if (it.url().equals(url)) {
@@ -413,25 +415,28 @@ class DispatchTool : Dispatch {
                 return@forEach
             }
         }
-        if (needDeleteTask != null) {
-            mRunningTasks.remove(needDeleteTask)
-            mRunningTasksUrl.remove(needDeleteTask!!.url())
-            DdNet.instance.cancelFirstTag(url)
+        synchronized(lock) {
+            if (needDeleteTask != null) {
+                mRunningTasks.remove(needDeleteTask)
+                mRunningTasksUrl.remove(needDeleteTask!!.url())
+                DdNet.instance.cancelFirstTag(url)
+            }
         }
     }
 
     fun cancelTask(task: Task?) {
         if (task == null) return
         task.cancel(task.url())
-        mTaskQueue.remove(task)
-        mTaskQueueUrl.remove(task.url())
-        mRunningTasks.remove(task).let {
-            if (it) {
-                DdNet.instance.cancelFirstTag(task.url())
+        synchronized(lock) {
+            mTaskQueue.remove(task)
+            mTaskQueueUrl.remove(task.url())
+            mRunningTasks.remove(task).let {
+                if (it) {
+                    DdNet.instance.cancelFirstTag(task.url())
+                }
             }
+            mRunningTasksUrl.remove(task.url())
         }
-        mRunningTasksUrl.remove(task.url())
-
     }
 
     fun getTask(url: String?): Task? {
