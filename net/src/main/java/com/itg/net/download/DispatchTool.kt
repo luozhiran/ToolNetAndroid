@@ -68,19 +68,17 @@ class DispatchTool : Dispatch {
     /**
      * 重任务队列中，获取新任务并下载该任务
      */
+    @Synchronized
     private fun downloadNextTask() {
-        synchronized(lock) {
-            if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
-                if (mTaskQueue.isNotEmpty() && mTaskQueueUrl.isNotEmpty()) {
-                    val task = mTaskQueue.removeFirst()
-                    mTaskQueueUrl.removeFirst()
-                    if (task.append()) {
-                        appendDownload(task as DTask)
-                    } else {
-                        download(task as DTask)
-                    }
+        if (mTaskQueue.size > 0 && mRunningTasks.size <= DdNet.instance.ddNetConfig.maxDownloadNum) {
+            if (mTaskQueue.isNotEmpty() && mTaskQueueUrl.isNotEmpty()) {
+                val task = mTaskQueue.removeFirst()
+                mTaskQueueUrl.removeFirst()
+                if (task.append()) {
+                    appendDownload(task as DTask)
+                } else {
+                    download(task as DTask)
                 }
-
             }
         }
     }
@@ -243,6 +241,20 @@ class DispatchTool : Dispatch {
             return false
         }
 //        task.progressCallback()?.onFail(ERROR_TAG_10, task)
+        return false
+    }
+
+    @Synchronized
+    fun exit(task: DTask):Boolean{
+        if (task.url().equals(task.cancel())) {
+            return true
+        }
+        if (taskQueueHasTask(task)) {
+            return true
+        }
+        if (runningQueueHasTask(task)) {
+            return true
+        }
         return false
     }
 

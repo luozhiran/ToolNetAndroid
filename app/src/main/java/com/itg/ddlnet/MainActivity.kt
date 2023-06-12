@@ -37,8 +37,8 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
-            for (i in 0.. 10) {
-                val path = "${filesDir}/${i}.zip";
+//            for (i in 0.. 1) {
+                val path = "${filesDir}/0.zip";
                 task = DdNet.instance.download
                     .downloadTask()
                     .path(path)
@@ -53,7 +53,7 @@ class MainActivity : AppCompatActivity() {
 
                         override fun onProgress(task: Task?) {
                             if (task?.getProgress() == 100) {
-                                Log.e("MainActivity", "download is success $i ${File(task.path()?:"").exists()}")
+                                Log.e("MainActivity", "download is success 0 ${File(task.path()?:"").exists()}")
                             }
                             Log.e("MainActivity","onProgress:"+task?.getProgress())
                         }
@@ -64,7 +64,7 @@ class MainActivity : AppCompatActivity() {
 
                     })
                     .start()
-            }
+//            }
 
 
         }

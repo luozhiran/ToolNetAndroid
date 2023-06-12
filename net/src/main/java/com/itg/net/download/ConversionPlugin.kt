@@ -12,10 +12,15 @@ class ConversionPlugin(val task: BusinessTask) {
     }
 
     fun start(): Task {
-        if (task.append()) {
-            DdNet.instance.download.dispatchTool.appendDownload(task)
+        // 需要请求的url已经存在，所以需要删除注册的监听器，并且不发送下载请求
+        if (DdNet.instance.download.dispatchTool.exit(task)) {
+            TaskCallbackMgr.instance.removeProgressCallback(task)
         } else {
-            DdNet.instance.download.dispatchTool.download(task)
+            if (task.append()) {
+                DdNet.instance.download.dispatchTool.appendDownload(task)
+            } else {
+                DdNet.instance.download.dispatchTool.download(task)
+            }
         }
         return task
     }
