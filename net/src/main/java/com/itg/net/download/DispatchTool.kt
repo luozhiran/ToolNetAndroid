@@ -4,6 +4,7 @@ import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
 import android.text.TextUtils
+import android.util.Log
 import com.itg.net.DdNet
 import com.itg.net.ModeType
 import com.itg.net.download.interfaces.Dispatch
@@ -54,7 +55,7 @@ class DispatchTool : Dispatch {
                             tryAgainDownloadTask(preTask.task, preTask.iProgressCallback)
                         }
                     }
-                } else {
+                } else { // DOWNLOAD_TASK CANCEL_TASK DOWNLOAD_FILE  DOWNLOAD_SUCCESS
                     downloadNextTask()
                 }
 
@@ -198,13 +199,13 @@ class DispatchTool : Dispatch {
     @Synchronized
     fun putTaskToRunning(task: DTask, deleteTaskQueue: Boolean = false): Boolean {
         return if (mRunningTasks.size < DdNet.instance.ddNetConfig.maxDownloadNum) {
-            mRunningTasks.add(task)
-            mRunningTasksUrl.add(task.url()!!)
+           val runningTaskSuc = mRunningTasks.add(task)
+            val runningTaskUrlSuc = mRunningTasksUrl.add(task.url()!!)
             if (deleteTaskQueue) {
                 mTaskQueue.remove(task)
                 mTaskQueueUrl.remove(task.url())
             }
-            true
+            runningTaskSuc && runningTaskUrlSuc
         } else {
             false
         }
@@ -217,6 +218,12 @@ class DispatchTool : Dispatch {
     }
 
 
+    /**
+     * 一个下载url只能下载一次；
+     * 如果下载缓存队列或者正在下载的队列存在下载任务，则不在惊险下载
+     * @param task DTask
+     * @return Boolean
+     */
     @Synchronized
     fun downloadQueueNoTask(task: DTask): Boolean {
         if (task.url().equals(task.cancel())) {
@@ -230,6 +237,7 @@ class DispatchTool : Dispatch {
         if (taskQueueHasTask(task) && !runningQueueHasTask(task)) {
             if (putTaskToRunning(task, true)) return true
         }
+        if (runningQueueHasTask(task)) return false
         if (!taskQueueHasTask(task)) {
             putTaskToQueue(task)
             return false
