@@ -35,15 +35,12 @@ class DispatchTool : Dispatch {
     @Volatile
     private var handler: ReceiverHandler? = null
 
-    private val lock = this
-
-
     init {
         val thread = HandlerThread("ddl")
         thread.start()
         looper = thread.looper
         handler = ReceiverHandler(looper!!) {
-            synchronized(lock) {
+            synchronized(this) {
                 if (it.what == DOWNLOAD_FILE) {
                     val preTask = it.obj as? TempTask?
                     if (preTask?.task == null) {
@@ -87,7 +84,7 @@ class DispatchTool : Dispatch {
      * 任务有重试次数，在一次上次失败的任务
      */
     private fun tryAgainDownloadTask(preTask: DTask, progressCallback: IProgressCallback?) {
-        synchronized(lock) {
+        synchronized(this) {
             if (mRunningTasks.contains(preTask)) {
                 progressCallback?.let {
                     //把外部的回调还原给任务
@@ -305,7 +302,7 @@ class DispatchTool : Dispatch {
         } else if (type == DOWNLOAD_SUCCESS) {
             task.progressCallback()?.onProgress(task)
         }
-        synchronized(lock) {
+        synchronized(this) {
             //重试下载时，不需要删除现在队列中的任务，会继续下载任务
             if (noNeedDeleteRunningQuent) {
                 mRunningTasksUrl.remove(task.url())
@@ -424,7 +421,7 @@ class DispatchTool : Dispatch {
                 return@forEach
             }
         }
-        synchronized(lock) {
+        synchronized(this) {
             if (needDeleteTask != null) {
                 mTaskQueue.remove(needDeleteTask)
                 mTaskQueueUrl.remove(needDeleteTask!!.url())
@@ -438,7 +435,7 @@ class DispatchTool : Dispatch {
                 return@forEach
             }
         }
-        synchronized(lock) {
+        synchronized(this) {
             if (needDeleteTask != null) {
                 mRunningTasks.remove(needDeleteTask)
                 mRunningTasksUrl.remove(needDeleteTask!!.url())
@@ -450,7 +447,7 @@ class DispatchTool : Dispatch {
     fun cancelTask(task: Task?) {
         if (task == null) return
         task.cancel(task.url())
-        synchronized(lock) {
+        synchronized(this) {
             mTaskQueue.remove(task)
             mTaskQueueUrl.remove(task.url())
             mRunningTasks.remove(task).let {
@@ -478,7 +475,7 @@ class DispatchTool : Dispatch {
     }
 
     fun isQueue(url: String?): Boolean {
-        synchronized(lock) {
+        synchronized(this) {
             return mRunningTasksUrl.contains(url) || mTaskQueueUrl.contains(url)
         }
     }
