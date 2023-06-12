@@ -17,17 +17,17 @@ class MainActivity : AppCompatActivity() {
     var stop = true
     private val progress = object : IProgressCallback{
         override fun onConnecting(task: Task?) {
-            Log.e("MainActivity","global onConnecting")
+//            Log.e("MainActivity","global onConnecting")
 
         }
 
         override fun onProgress(task: Task?) {
-            Log.e("MainActivity","global onProgress"+task?.getProgress())
+//            Log.e("MainActivity","global onProgress"+task?.getProgress())
 
         }
 
         override fun onFail(error: String?, task: Task?) {
-            Log.e("MainActivity",error?:"")
+//            Log.e("MainActivity",error?:"")
 
         }
 
@@ -37,8 +37,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
-//            for (i in 0.. 1) {
-                val path = "${filesDir}/0.zip";
+            for (i in 0.. 10) {
+                Thread.sleep(1000)
+                Log.e("MainActivity","延时$i")
+                val path = "${filesDir}/$i.zip";
                 task = DdNet.instance.download
                     .downloadTask()
                     .path(path)
@@ -48,14 +50,13 @@ class MainActivity : AppCompatActivity() {
                     .prepareEnd()
                     .setProgressListener(object : IProgressCallback{
                         override fun onConnecting(task: Task?) {
-                            Log.e("MainActivity","onConnecting")
+                            Log.e("MainActivity","onConnecting $i")
                         }
 
                         override fun onProgress(task: Task?) {
                             if (task?.getProgress() == 100) {
-                                Log.e("MainActivity", "download is success 0 ${File(task.path()?:"").exists()}")
+                                Log.e("MainActivity", "download is success $path $i ${File(task.path()?:"").exists()}")
                             }
-                            Log.e("MainActivity","onProgress:"+task?.getProgress())
                         }
 
                         override fun onFail(error: String?, task: Task?) {
@@ -64,7 +65,7 @@ class MainActivity : AppCompatActivity() {
 
                     })
                     .start()
-//            }
+            }
 
 
         }
