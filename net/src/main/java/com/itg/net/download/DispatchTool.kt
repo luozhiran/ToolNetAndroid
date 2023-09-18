@@ -399,10 +399,10 @@ class DispatchTool : Dispatch {
             }
         } catch (e: FileNotFoundException) {
             e.printStackTrace()
-            callback.invoke(DOWNLOAD_FILE, ERROR_TAG_7)
+            callback.invoke(DOWNLOAD_FILE, e.message+"")
         } catch (e: IOException) {
             e.printStackTrace()
-            callback.invoke(DOWNLOAD_FILE, ERROR_TAG_8)
+            callback.invoke(DOWNLOAD_FILE, e.message+"")
         } finally {
             try {
                 out?.close()
