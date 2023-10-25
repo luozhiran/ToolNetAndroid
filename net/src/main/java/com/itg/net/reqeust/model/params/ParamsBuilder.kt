@@ -22,13 +22,13 @@ import org.json.JSONObject
  */
 abstract class ParamsBuilder : Builder, SentBuilder {
     var url: String? = DdNet.instance.ddNetConfig.url
-    private val headerSb = StringBuilder()
+    private val headerStringBuilder = StringBuilder()
     var cookies: String? = null
     var tag: String? = null
 
     override fun addHeader(key: String?, value: String?): ParamsBuilder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
-        UrlTools.appendUrlParamsToStr(headerSb,key,value)
+        UrlTools.appendUrlParamsToStr(headerStringBuilder,key,value)
         return this
     }
 
@@ -59,9 +59,9 @@ abstract class ParamsBuilder : Builder, SentBuilder {
     }
 
     internal fun getHeader(): Headers? {
-        if (headerSb.isBlank() && cookies.isNullOrBlank()) return null
+        if (headerStringBuilder.isBlank() && cookies.isNullOrBlank()) return null
         val builder: Headers.Builder = Headers.Builder()
-        val headerParams = UrlTools.cutOffStrToMap(headerSb.toString())
+        val headerParams = UrlTools.cutOffStrToMap(headerStringBuilder.toString())
         headerParams?.forEach{entry ->
             builder.add(entry.key, entry.value.toString())
         }

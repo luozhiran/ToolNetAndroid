@@ -49,7 +49,7 @@ abstract class PostContentBuilder : ParamsBuilder() {
         return contents?.get(index)?.toRequestBody(mt)
     }
 
-    internal fun addAppendParams(key: String?, value: String?): PostContentBuilder {
+    fun addAppendParams(key: String?, value: String?): PostContentBuilder {
         UrlTools.appendUrlParamsToStr(urlParams,key,value)
         return this
     }
