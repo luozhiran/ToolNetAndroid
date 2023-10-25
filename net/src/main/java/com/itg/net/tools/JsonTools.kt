@@ -1,6 +1,6 @@
-package com.itg.net
+package com.itg.net.tools
 
-object JsonUtil {
+object JsonTools {
     /**
      * 格式化json字符串
      *
