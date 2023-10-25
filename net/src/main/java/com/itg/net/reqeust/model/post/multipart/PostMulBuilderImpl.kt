@@ -13,6 +13,7 @@ import com.itg.net.reqeust.model.post.content.PostContentBuilder
 import com.itg.net.reqeust.model.post.file.PostFileBuilder
 import com.itg.net.reqeust.model.post.form.PostFormBuilder
 import com.itg.net.reqeust.model.post.json.PostJsonBuilder
+import com.itg.net.tools.UrlTools
 import okhttp3.*
 import java.io.File
 
@@ -141,7 +142,7 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
     }
 
     fun addAppendParams(key: String?, value: String?): PostMulBuilderImpl {
-        urlParams.append(key).append("#").append(value).append("$")
+        UrlTools.appendUrlParamsToStr(urlParams,key,value)
         return this
     }
 
@@ -149,42 +150,14 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
         return urlParams
     }
 
-    /**
-     * 把urlParams放到url的后面
-     *
-     */
-    private fun mergeParam(params:StringBuilder): StringBuilder {
-        val globalMap = DdNet.instance.ddNetConfig.globalParams
-        return if (globalMap.isNotEmpty()) {
-            val localBuild = StringBuilder()
-            val params = params.toString()
-            globalMap.forEach {
-                val str = it.key + "#" + it.value
-                if (!params.contains(str)) {
-                    localBuild.append(str).append("$")
-                }
-            }
-            localBuild.append(params)
-        } else {
-            params
-        }
-    }
-
     internal fun getUrl(): String {
-        val urlParam = mergeParam(urlParams)
-        if (urlParam.isNotBlank()) {
-            val urlBuild = Uri.parse(this.url).buildUpon()
-            val keyValue = urlParam.toString().split("$")
-            if (keyValue.isEmpty()) return this.url ?: ""
-            keyValue.forEach { value ->
-                val s = value.split("#")
-                if (s.isNotEmpty() && s.size == 2) {
-                    urlBuild.appendQueryParameter(s[0], s[1])
-                }
-            }
-            this.url = urlBuild.build().toString()
+        val urlParamsMap = UrlTools.cutOffStrToMap(urlParams.toString())
+        val totalParamsMap = mutableMapOf<String,Any?>()
+        totalParamsMap.putAll(DdNet.instance.ddNetConfig.globalParams)
+        urlParamsMap?.let {
+            totalParamsMap.putAll(it)
         }
-        return this.url ?: ""
+        return UrlTools.getSpliceUrl(totalParamsMap,this.url?:"")
     }
 
 }

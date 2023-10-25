@@ -72,7 +72,9 @@ class MainActivity : AppCompatActivity() {
 
         findViewById<Button>(R.id.get).setOnClickListener {
             DdNet.instance.get()
-                .url("https://www.baidu.com")
+                .url("http://www.baidu.com")
+                .addParam("key1","a")
+                .addParam("key2","b")
                 .autoCancel(this)
                 .send(object :DdCallback{
                     override fun onFailure(er: String?) {

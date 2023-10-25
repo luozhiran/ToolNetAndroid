@@ -5,6 +5,8 @@ import android.net.Uri
 import com.itg.net.DdNet
 import com.itg.net.base.Builder
 import com.itg.net.reqeust.model.post.file.PostFileGenerator
+import com.itg.net.tools.StrTools
+import com.itg.net.tools.UrlTools
 import okhttp3.Cookie
 import okhttp3.Headers
 import org.json.JSONObject
@@ -26,7 +28,7 @@ abstract class ParamsBuilder : Builder, SentBuilder {
 
     override fun addHeader(key: String?, value: String?): ParamsBuilder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
-        headerSb.append(key).append("#").append(value).append("$")
+        UrlTools.appendUrlParamsToStr(headerSb,key,value)
         return this
     }
 
@@ -46,17 +48,7 @@ abstract class ParamsBuilder : Builder, SentBuilder {
     override fun addCookie(cookie: Cookie?): ParamsBuilder = addCookie(mutableListOf(cookie))
 
     override fun addCookie(cookie: List<Cookie?>?): ParamsBuilder {
-        if (cookie == null || cookie.isEmpty()) return this
-        val cookieHeader = StringBuilder()
-        cookie.forEachIndexed { index, value ->
-            if (index > 0) {
-                cookieHeader.append("; ")
-            }
-            if (value != null) {
-                cookieHeader.append(value.name).append("=").append(value.value)
-            }
-        }
-        cookies = cookieHeader.toString()
+        cookies = StrTools.getCookieString(cookie)
         return this
     }
 
@@ -67,39 +59,23 @@ abstract class ParamsBuilder : Builder, SentBuilder {
     }
 
     internal fun getHeader(): Headers? {
-        val builder: Headers.Builder? =
-            if (headerSb.isNotEmpty() || cookies.orEmpty().isNotEmpty()) {
-                Headers.Builder()
-            } else {
-                null
-            }
-
-        if (builder == null) return null
-        if (headerSb.isNotEmpty()) {
-            headerSb.toString()
-                .split("$")
-                .forEach { value ->
-                    val splitStr = value.split("#")
-                    if (splitStr.isNotEmpty() && splitStr.size == 2) {
-                        builder.add(splitStr[0], splitStr[1])
-                    }
-                }
+        if (headerSb.isBlank() && cookies.isNullOrBlank()) return null
+        val builder: Headers.Builder = Headers.Builder()
+        val headerParams = UrlTools.cutOffStrToMap(headerSb.toString())
+        headerParams?.forEach{entry ->
+            builder.add(entry.key, entry.value.toString())
         }
-
         if (cookies.orEmpty().isNotBlank()) {
-            builder.add("Cookie", cookies!!)
+            cookies?.let { builder.add("Cookie", it) }
         }
         return builder.build()
     }
 
     private fun formToJson(formParams: StringBuilder): String {
-        val formParamsArray = formParams.split("$")
+        val headerParams = UrlTools.cutOffStrToMap(formParams.toString())
         val json = JSONObject()
-        formParamsArray.forEach { str ->
-            val array = str.split("#")
-            if (array.size > 1) {
-                json.put(array[0], array[1])
-            }
+        headerParams?.forEach { entry ->
+            json.put(entry.key, entry.value)
         }
         return json.toString()
     }

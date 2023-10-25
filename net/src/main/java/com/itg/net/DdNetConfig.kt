@@ -18,7 +18,7 @@ class DdNetConfig {
     internal var url: String? = null
     internal var maxDownloadNum = 3
     internal var pkgName: String? = null
-    val globalParams = HashMap<String, Any>()
+    val globalParams = HashMap<String, Any?>()
     private var handler: Handler? = null
     var application: Application? = null
     private var mDateFormat = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.CHINA)
