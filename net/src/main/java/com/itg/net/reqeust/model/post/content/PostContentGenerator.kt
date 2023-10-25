@@ -8,20 +8,14 @@ import okhttp3.Cookie
 abstract class PostContentGenerator : PostContentBuilder() {
 
     fun addContent(content: String?, mediaType: String?): PostContentBuilder {
-        super.addContent1(content, mediaType)
+        addRealContent(content, mediaType)
         return this
     }
 
-
-    fun addContent(
-        content: String?,
-        contentFlag: String?,
-        mediaType: String?
-    ): PostContentGenerator {
-        super.addContent1(content, contentFlag, mediaType)
+    fun addContent(content: String?, contentFlag: String?, mediaType: String?): PostContentGenerator {
+        addRealContent(content, contentFlag, mediaType)
         return this
     }
-
 
     override fun autoCancel(activity: Activity?): PostContentGenerator {
         return this

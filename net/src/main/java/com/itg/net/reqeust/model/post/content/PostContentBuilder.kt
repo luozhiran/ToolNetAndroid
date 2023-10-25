@@ -20,14 +20,10 @@ abstract class PostContentBuilder : ParamsBuilder() {
         contentMediaTypes = mutableListOf()
         contentNames = mutableListOf()
     }
-   internal fun addContent1(content: String?, mediaType: String?): PostContentBuilder =
-        addContent1(content, "", mediaType)
+   internal fun addRealContent(content: String?, mediaType: String?): PostContentBuilder =
+       addRealContent(content, "", mediaType)
 
-   internal fun addContent1(
-        content: String?,
-        contentFlag: String?,
-        mediaType: String?
-    ): PostContentBuilder {
+   internal fun addRealContent(content: String?, contentFlag: String?, mediaType: String?): PostContentBuilder {
         this.contents?.add(content)
         this.contentNames?.add(contentFlag)
         this.contentMediaTypes?.add(mediaType)
@@ -35,9 +31,8 @@ abstract class PostContentBuilder : ParamsBuilder() {
     }
 
     internal fun getRequestBody(): RequestBody? {
-        if (contentMediaTypes == null || contentMediaTypes?.size == 0) {
-            return null
-        }
+        if (contentMediaTypes.isNullOrEmpty()) return null
+        if (contentMediaTypes.isNullOrEmpty()) return null
         val mt = contentMediaTypes?.get(0)?.toMediaTypeOrNull()
         return contents?.get(0)?.toRequestBody(mt)
     }
