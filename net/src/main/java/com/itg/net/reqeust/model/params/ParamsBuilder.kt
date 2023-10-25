@@ -52,13 +52,12 @@ abstract class ParamsBuilder : Builder, SentBuilder {
         return this
     }
 
-
     override fun addTag(tag: String?): ParamsBuilder {
         this.tag = tag
         return this
     }
 
-    internal fun getHeader(): Headers? {
+    protected fun getHeader(): Headers? {
         if (headerStringBuilder.isBlank() && cookies.isNullOrBlank()) return null
         val builder: Headers.Builder = Headers.Builder()
         val headerParams = UrlTools.cutOffStrToMap(headerStringBuilder.toString())

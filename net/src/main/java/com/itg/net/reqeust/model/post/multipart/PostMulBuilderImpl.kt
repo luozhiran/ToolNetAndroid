@@ -83,12 +83,12 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
     }
 
     override fun addContent(content: String?, mediaType: String?): PostMulBuilderImpl {
-        postContent.addContent1(content, "", mediaType)
+        postContent.addRealContent(content, "", mediaType)
         return this;
     }
 
     override fun addContent(content: String?, contentFlag: String?, mediaType: String?): PostMulBuilderImpl {
-        postContent.addContent1(content,contentFlag,mediaType)
+        postContent.addRealContent(content,contentFlag,mediaType)
         return this
     }
 

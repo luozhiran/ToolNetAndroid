@@ -30,21 +30,22 @@ abstract class PostContentBuilder : ParamsBuilder() {
         return this
     }
 
-    internal fun getRequestBody(): RequestBody? {
+    protected fun getRequestBody(): RequestBody? {
         if (contentMediaTypes.isNullOrEmpty()) return null
         if (contentMediaTypes.isNullOrEmpty()) return null
         val mt = contentMediaTypes?.get(0)?.toMediaTypeOrNull()
         return contents?.get(0)?.toRequestBody(mt)
     }
 
-    internal fun getCount():Int {
+    fun getCount():Int {
         return this.contents?.size?:0
     }
-    internal fun getContentName(index:Int):String{
+
+    fun getContentName(index:Int):String{
         return contentNames?.get(index)?:""
     }
 
-    internal fun getRequestBody(index:Int): RequestBody?{
+    fun getRequestBody(index:Int): RequestBody?{
         val mt = contentMediaTypes?.get(index)?.toMediaTypeOrNull()
         return contents?.get(index)?.toRequestBody(mt)
     }
