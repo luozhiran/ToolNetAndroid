@@ -1,6 +1,5 @@
 package com.itg.net.download
 
-import com.itg.net.DdNet
 import com.itg.net.download.interfaces.IProgressCallback
 
 /**
@@ -16,30 +15,30 @@ internal class TaskCallbackMgr {
     private val progressCallbackMap: MutableMap<String, IProgressCallback> by lazy { mutableMapOf() }
 
 
-    fun loopConnecting(task:DTask){
+    fun loopConnecting(task:Task){
         val uniqueId = getDownloadCallbackUniqueId(task)
         progressCallbackMap[uniqueId]?.onConnecting(task)
     }
 
-    fun loop(task:DTask?){
+    fun loop(task:Task?){
         if (task == null)return
         val uniqueId = getDownloadCallbackUniqueId(task)
         progressCallbackMap[uniqueId]?.onProgress(task)
 
     }
 
-    fun loopFail(msg:String,task: DTask?){
+    fun loopFail(msg:String,task: Task?){
         if (task == null)return
         val uniqueId = getDownloadCallbackUniqueId(task)
         progressCallbackMap[uniqueId]?.onFail(msg,task)
 
     }
 
-   private fun getDownloadCallbackUniqueId(task: DTask):String{
+   private fun getDownloadCallbackUniqueId(task: Task):String{
         return "${task.uniqueId}:${task.url()}"
     }
 
-    fun setProgressCallback(task: DTask,progressCallback:IProgressCallback){
+    fun setProgressCallback(task: Task, progressCallback:IProgressCallback){
         val uniqueId = getDownloadCallbackUniqueId(task)
         progressCallbackMap[uniqueId] = progressCallback
     }
@@ -48,12 +47,12 @@ internal class TaskCallbackMgr {
         progressCallbackMap.remove(uniqueId)
     }
 
-    fun removeProgressCallback(task: DTask){
+    fun removeProgressCallback(task: Task){
         val uniqueId = getDownloadCallbackUniqueId(task)
         progressCallbackMap.remove(uniqueId)
     }
 
-    fun getProgressCallback(task: DTask):IProgressCallback? {
+    fun getProgressCallback(task: Task):IProgressCallback? {
         val uniqueId = getDownloadCallbackUniqueId(task)
         return progressCallbackMap[uniqueId]
     }

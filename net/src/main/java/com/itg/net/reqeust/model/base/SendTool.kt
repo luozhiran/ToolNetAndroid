@@ -6,38 +6,26 @@ import android.os.Message
 import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
+import com.itg.net.download.operations.PrincipalLife
 import com.itg.net.reqeust.MyLifecycleEventObserver
 import com.itg.net.reqeust.model.post.content.PostContent
 import okhttp3.*
 import java.io.IOException
 
 class SendTool {
-
-    private val lifeObservable by lazy { MyLifecycleEventObserver() }
-    private var activity: Activity? = null
+    private val principalLife by lazy { PrincipalLife() }
 
     fun autoCancel(activity: Activity?): SendTool {
-        this.activity = activity
+        principalLife.addActivity(activity)
         return this
     }
 
-
     private fun registerEvent(call: Call?) {
-        if (call == null) return
-        val tempActivity = (activity as? ComponentActivity)
-        lifeObservable.setCallback {
-            call.cancel()
-            unregisterEvent()
-        }
-        tempActivity?.lifecycle?.addObserver(lifeObservable)
+        principalLife.registerEvent(call)
     }
 
     fun unregisterEvent() {
-        val tempActivity = (activity as? ComponentActivity)
-        tempActivity?.runOnUiThread {
-            tempActivity.lifecycle.removeObserver(lifeObservable)
-            activity = null
-        }
+        principalLife.unregisterEvent()
     }
 
     fun combineParamsAndRCall(

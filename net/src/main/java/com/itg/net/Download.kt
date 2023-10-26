@@ -1,17 +1,17 @@
 package com.itg.net
 
 import com.itg.net.download.BusinessTask
-import com.itg.net.download.DTask
+import com.itg.net.download.Task
 import com.itg.net.download.DispatchTool
 import com.itg.net.download.TaskCallbackMgr
 import com.itg.net.download.interfaces.IProgressCallback
-import com.itg.net.download.interfaces.Task
+import com.itg.net.download.interfaces.ITask
 
 class Download {
 
     val dispatchTool: DispatchTool by lazy { DispatchTool() }
 
-    fun downloadTask(): DTask {
+    fun downloadTask(): Task {
         return BusinessTask()
     }
 
@@ -37,26 +37,35 @@ class Download {
      * 或者调用DdNet.instance.download.cancel(task),取消任务同时会释放下载器
      * @param task Task?
      */
-    fun removeInnerProgressListener(task: Task?){
-        if (task is DTask) {
+    fun removeInnerProgressListener(task: ITask?){
+        if (task is Task) {
             TaskCallbackMgr.instance.removeProgressCallback(task)
         }
     }
 
     fun isQueue(url: String): Boolean {
-        return dispatchTool.isQueue(url)
+        val taskState = dispatchTool.getTaskState()
+        return taskState.exitWaitUrl(url) || taskState.exitRunningUrl(url)
     }
 
     fun cancel(url: String?) {
-        dispatchTool.cancelTask(url)
+        val taskState = dispatchTool.getTaskState()
+        if (taskState.exitRunningUrl(url)) {
+            taskState.deleteRunningTask(url)
+            DdNet.instance.cancelFirstTag(url)
+        }else if (taskState.exitWaitUrl(url)) {
+            taskState.deleteWaitTask(url)
+        }
     }
 
-    fun cancel(task: Task?) {
-        dispatchTool.cancelTask(task)
-    }
-
-    fun getTask(url: String): Task? {
-        return dispatchTool.getTask(url)
+    fun cancel(task: ITask?) {
+        val taskState = dispatchTool.getTaskState()
+        if (taskState.exitRunningTask(task)) {
+            taskState.deleteRunningTask(task)
+            DdNet.instance.cancelFirstTag(task?.url())
+        } else if (taskState.exitWaitTask(task)) {
+            taskState.deleteWaitTask(task)
+        }
     }
 
 }

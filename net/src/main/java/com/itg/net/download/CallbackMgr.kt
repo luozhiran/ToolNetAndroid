@@ -1,7 +1,6 @@
 package com.itg.net.download
 
 import com.itg.net.download.interfaces.IProgressCallback
-import java.util.*
 
 class CallbackMgr {
     private val lock: Any = Any()
@@ -28,7 +27,7 @@ class CallbackMgr {
         return  tempList;
     }
 
-    fun loopConnecting(task:DTask){
+    fun loopConnecting(task:Task){
         synchronized(lock) {
             getTempArray().forEach {
                 it.onConnecting(task)
@@ -37,7 +36,7 @@ class CallbackMgr {
 
     }
 
-    fun loop(task:DTask){
+    fun loop(task:Task){
         synchronized(lock) {
             getTempArray().forEach {
                 it.onProgress(task)
@@ -45,7 +44,7 @@ class CallbackMgr {
         }
     }
 
-    fun loopFail(msg:String,task: DTask?){
+    fun loopFail(msg:String,task: Task?){
         if (task == null)return
         synchronized(lock) {
             getTempArray().forEach {

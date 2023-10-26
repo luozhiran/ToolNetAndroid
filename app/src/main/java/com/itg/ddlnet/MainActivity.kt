@@ -8,25 +8,24 @@ import com.itg.net.DdNet
 import com.itg.net.MEDIA_JSON
 import com.itg.net.base.DdCallback
 import com.itg.net.download.interfaces.IProgressCallback
-import com.itg.net.download.interfaces.Task
-import com.itg.net.reqeust.model.get.GetGenerator
+import com.itg.net.download.interfaces.ITask
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    var task:Task?=null
+    var task:ITask?=null
     var stop = true
     private val progress = object : IProgressCallback{
-        override fun onConnecting(task: Task?) {
+        override fun onConnecting(task: ITask?) {
 //            Log.e("MainActivity","global onConnecting")
 
         }
 
-        override fun onProgress(task: Task?) {
+        override fun onProgress(task: ITask?) {
 //            Log.e("MainActivity","global onProgress"+task?.getProgress())
 
         }
 
-        override fun onFail(error: String?, task: Task?) {
+        override fun onFail(error: String?, task: ITask?) {
 //            Log.e("MainActivity",error?:"")
 
         }
@@ -49,17 +48,17 @@ class MainActivity : AppCompatActivity() {
                     .tryAgainCount(3)
                     .prepareEnd()
                     .setProgressListener(object : IProgressCallback{
-                        override fun onConnecting(task: Task?) {
+                        override fun onConnecting(task: ITask?) {
                             Log.e("MainActivity","onConnecting $i")
                         }
 
-                        override fun onProgress(task: Task?) {
+                        override fun onProgress(task: ITask?) {
                             if (task?.getProgress() == 100) {
                                 Log.e("MainActivity", "download is success $path $i ${File(task.path()?:"").exists()}")
                             }
                         }
 
-                        override fun onFail(error: String?, task: Task?) {
+                        override fun onFail(error: String?, task: ITask?) {
                             Log.e("MainActivity","onFail $error")
                         }
 

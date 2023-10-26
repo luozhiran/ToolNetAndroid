@@ -1,6 +1,6 @@
 package com.itg.net.download.interfaces
 
-interface Task {
+interface ITask {
     fun append(): Boolean
 
     fun getProgress(): Int

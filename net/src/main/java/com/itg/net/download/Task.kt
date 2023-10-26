@@ -1,9 +1,9 @@
 package com.itg.net.download
 
 import com.itg.net.download.interfaces.IProgressCallback
-import com.itg.net.download.interfaces.Task
+import com.itg.net.download.interfaces.ITask
 
-abstract class DTask : Task {
+abstract class Task : ITask {
 
     var param: HashMap<String, String>? = null
     private var tUrl: String? = null
