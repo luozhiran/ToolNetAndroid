@@ -23,8 +23,6 @@ class DirectRequest(private val task: Task, taskStateInstance: TaskState) : Base
         }, onFailure = { _, ioException ->
             failureCallback?.invoke(task,ioException.message.toString())
         })
-        getBuilder().send(okHttpCallback) { call: Call? ->
-            (task as? BusinessTask)?.registerEvent(call, task)
-        }
+        getBuilder().autoCancel((task as? BusinessTask)?.getActivity()).send(okHttpCallback,task)
     }
 }

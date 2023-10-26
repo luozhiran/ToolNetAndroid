@@ -6,6 +6,7 @@ import android.os.Message
 import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
+import com.itg.net.download.Task
 import com.itg.net.reqeust.MyLifecycleEventObserver
 import com.itg.net.reqeust.model.base.SendTool
 import com.itg.net.reqeust.model.params.ParamsBuilder
@@ -46,14 +47,14 @@ class Get : GetGenerator() {
 
     }
 
-    override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {
+    override fun send(response: Callback?,task: Task?) {
         val call = sendTool.combineParamsAndRCall(
             getHeader(),
             getUrl(),
             tag,
             null
         ) { builder -> builder.get() }
-        sendTool.send(response, call,callback)
+        sendTool.send(response, call, task)
     }
 
 

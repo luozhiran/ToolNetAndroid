@@ -7,10 +7,11 @@ import com.itg.net.download.interfaces.ITask
 import com.itg.net.download.operations.DownloadEndNotify
 import com.itg.net.download.operations.PrincipalLife
 import okhttp3.Call
+import java.lang.ref.WeakReference
 
 class BusinessTask : Task() {
-    private val principalLife by lazy { PrincipalLife() }
-    val download = DdNet.instance.download
+    private var activity: WeakReference<Activity>? = null
+
     init {
         registerProgressListener()
     }
@@ -22,38 +23,33 @@ class BusinessTask : Task() {
             }
 
             override fun onProgress(task: ITask?) {
-                if (!download.dispatchTool.getTaskState().downloadComplete(task!!)) {
+                if (!DdNet.instance.download.dispatchTool.getTaskState().downloadComplete(task!!)) {
                     DownloadEndNotify.progressNotify(task)
                 } else {
                     DownloadEndNotify.completeNotify(task)
-                    unregisterEvent(task)
                 }
             }
 
-            override fun onFail(error: String?, task:ITask?) {
-                DownloadEndNotify.failNotify(task,error)
-                unregisterEvent(task)
-
+            override fun onFail(error: String?, task: ITask?) {
+                DownloadEndNotify.failNotify(task, error)
             }
         })
         return this
     }
 
     fun autoCancel(activity: Activity?): BusinessTask {
-        principalLife.addActivity(activity)
+        activity?.let {
+            this.activity = WeakReference<Activity>(it)
+        }
         return this
     }
+
+    fun getActivity(): Activity? {
+        return this.activity?.get()
+    }
+
     fun prepareEnd(): ConversionPlugin {
         return ConversionPlugin(this)
     }
-
-    fun registerEvent(call: Call?,task: ITask) {
-        principalLife.registerEvent(call,task)
-    }
-
-    private fun unregisterEvent(task: ITask?) {
-        principalLife.unregisterEvent(task)
-    }
-
 
 }

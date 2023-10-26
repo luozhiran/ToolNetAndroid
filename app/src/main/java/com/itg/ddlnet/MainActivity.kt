@@ -44,7 +44,6 @@ class MainActivity : AppCompatActivity() {
                     .downloadTask()
                     .path(path)
                     .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
-                    .autoCancel(this)
                     .tryAgainCount(3)
                     .prepareEnd()
                     .setProgressListener(object : IProgressCallback{

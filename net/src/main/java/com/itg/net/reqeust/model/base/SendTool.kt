@@ -6,6 +6,7 @@ import android.os.Message
 import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
+import com.itg.net.download.Task
 import com.itg.net.download.operations.PrincipalLife
 import com.itg.net.reqeust.MyLifecycleEventObserver
 import com.itg.net.reqeust.model.post.content.PostContent
@@ -18,14 +19,6 @@ class SendTool {
     fun autoCancel(activity: Activity?): SendTool {
         principalLife.addActivity(activity)
         return this
-    }
-
-    private fun registerEvent(call: Call?) {
-        principalLife.registerEvent(call)
-    }
-
-    fun unregisterEvent() {
-        principalLife.unregisterEvent()
     }
 
     fun combineParamsAndRCall(
@@ -61,13 +54,13 @@ class SendTool {
 
     fun send(callback: DdCallback?, call: Call?) {
         if (call == null) callback?.onFailure("url is error,please check url")
-        registerEvent(call)
+        principalLife.registerEvent(call)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
                     callback?.onFailure(e.message)
                 }
-                unregisterEvent()
+                principalLife.unregisterEvent()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -75,7 +68,7 @@ class SendTool {
                     callback?.onResponse(response.body?.string(), response.code)
                 }
                 response.body?.close()
-                unregisterEvent()
+                principalLife.unregisterEvent()
             }
         })
     }
@@ -87,7 +80,7 @@ class SendTool {
             msg.obj = "url is error,please check url"
             handler?.sendMessage(msg)
         }
-        registerEvent(call)
+        principalLife.registerEvent(call)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
@@ -96,7 +89,7 @@ class SendTool {
                     msg.obj = e.message
                     handler?.sendMessage(msg)
                 }
-                unregisterEvent()
+                principalLife.unregisterEvent()
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -108,17 +101,28 @@ class SendTool {
                     handler?.sendMessage(msg)
                 }
                 response.body?.close()
-                unregisterEvent()
+                principalLife.unregisterEvent()
             }
         })
     }
 
-    fun send(response: Callback?, call: Call?, callback: ((Call?) -> Unit)?) {
+    fun send(callback: Callback?, call: Call?,task:Task?) {
         call ?: return
-        if (response != null) {
-            callback?.invoke(call)
-            call.enqueue(response)
-        }
+        callback?:return
+        task?:return
+        principalLife.registerEvent(call,task)
+        call.enqueue(object : Callback{
+            override fun onFailure(call: Call, e: IOException) {
+                callback.onFailure(call,e)
+                principalLife.unregisterEvent(task)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                callback.onResponse(call,response)
+                principalLife.unregisterEvent(task)
+            }
+
+        })
     }
 
 

@@ -45,9 +45,7 @@ class BreakpointContinuationRequest(private val task: Task, taskStateInstance:Ta
         }, onFailure = { _, ioException ->
             failureCallback?.invoke(task,ioException.message.toString())
         })
-        getBreakpointContinuationBuilder(task, range).send(okHttpCallback) { call: Call? ->
-            (task as? BusinessTask)?.registerEvent(call, task)
-        }
+        getBreakpointContinuationBuilder(task, range).send(okHttpCallback,task)
     }
 
     override fun start(){
@@ -61,7 +59,7 @@ class BreakpointContinuationRequest(private val task: Task, taskStateInstance:Ta
         }, onFailure = { _, iOException ->
             failureCallback?.invoke(task,iOException.message.toString())
         })
-        getBuilder().send(okHttpCallback){call-> (task as? BusinessTask)?.registerEvent(call, task) }
+        getBuilder().autoCancel((task as? BusinessTask)?.getActivity()).send(okHttpCallback,task)
     }
 
 
