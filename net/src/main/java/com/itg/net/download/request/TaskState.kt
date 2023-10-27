@@ -16,24 +16,23 @@ class TaskState {
     private val waitTaskLock by lazy { LockData() }
 
     //队列下载任务
-    private val mWaitTask: MutableList<ITask> by lazy { mutableListOf() }
+    private val mWaitTask: MutableList<Task> by lazy { mutableListOf() }
     private val mWaitQueueUrl: MutableList<String?> by lazy { mutableListOf() }
 
     //正在执行任务
-    private val mRunningTasks: MutableList<ITask> by lazy { mutableListOf() }
+    private val mRunningTasks: MutableList<Task> by lazy { mutableListOf() }
     private val mRunningTasksUrl: MutableList<String?> by lazy { mutableListOf() }
 
 
-    fun addWaitTask(task: ITask?):Boolean {
-        if (task == null) return false
+    fun addWaitTask(task: Task):Boolean {
         synchronized(waitTaskLock) {
-            if (exitWaitUrl(task.url())) {
+            if (exitWaitUrl(task.url)) {
                 // 添加下载任务失败时，需要删除创建任务时生成的全局变量
                 PrincipalLife.removeProgressCallback(task as? Task)
                 return false
             }
             if (mWaitTask.add(task)) {
-                mWaitQueueUrl.add(task.url())
+                mWaitQueueUrl.add(task.url)
                 return true
             }
         }
@@ -42,13 +41,13 @@ class TaskState {
         return false
     }
 
-    fun deleteWaitTask(task: ITask?) {
+    fun deleteWaitTask(task: Task?) {
         if (task == null) return
         synchronized(waitTaskLock) {
             if (mWaitTask.remove(task)) {
-                mWaitQueueUrl.remove(task.url())
+                mWaitQueueUrl.remove(task.url)
             }
-            PrincipalLife.removeProgressCallback(task as? Task)
+            PrincipalLife.removeProgressCallback(task)
         }
     }
 
@@ -56,13 +55,13 @@ class TaskState {
         if (!quickDeleteWaitTask(url)) {
             synchronized(waitTaskLock) {
                 val iterator = mWaitTask.iterator()
-                var item: ITask? = null
+                var item: Task? = null
                 while (iterator.hasNext()) {
                     item = iterator.next()
-                    if (item.url() == url) {
+                    if (item.url == url) {
                         iterator.remove()
                         mWaitQueueUrl.remove(url)
-                        PrincipalLife.removeProgressCallback(item as? Task)
+                        PrincipalLife.removeProgressCallback(item)
                         break
                     }
                 }
@@ -75,10 +74,10 @@ class TaskState {
         synchronized(waitTaskLock) {
             val position = mWaitQueueUrl.indexOf(url)
             if (position > 0 && position < mWaitTask.size) {
-                if (mWaitTask[position].url() == url) {
+                if (mWaitTask[position].url == url) {
                     mWaitQueueUrl.removeAt(position)
                     val task = mWaitTask.removeAt(position)
-                    PrincipalLife.removeProgressCallback(task as? Task)
+                    PrincipalLife.removeProgressCallback(task)
                     return true
                 }
             }
@@ -86,7 +85,7 @@ class TaskState {
         return false
     }
 
-    private fun findFirstTaskFromWaitQueue(): ITask? {
+    private fun findFirstTaskFromWaitQueue(): Task? {
         if (mWaitTask.size > 0) {
             mWaitQueueUrl.removeAt(0)
             return mWaitTask.removeAt(0)
@@ -94,16 +93,16 @@ class TaskState {
         return null
     }
 
-    fun addRunningTask(task: ITask?): Boolean {
+    fun addRunningTask(task: Task?): Boolean {
         if (task == null) return false
         synchronized(runningTaskLock) {
-            if (mRunningTasksUrl.contains(task.url())) {
+            if (mRunningTasksUrl.contains(task.url)) {
                 // 添加下载任务失败时，需要删除创建任务时生成的全局变量
-                PrincipalLife.removeProgressCallback(task as? Task)
+                PrincipalLife.removeProgressCallback(task)
                 return false
             }
             if (mRunningTasks.add(task)) {
-                mRunningTasksUrl.add(task.url())
+                mRunningTasksUrl.add(task.url)
                 return true
             }
         }
@@ -112,14 +111,14 @@ class TaskState {
         return false
     }
 
-    fun deleteRunningTask(task: ITask?) {
+    fun deleteRunningTask(task: Task?) {
         if (task == null) return
         synchronized(runningTaskLock) {
             if (mRunningTasks.remove(task)) {
-                mRunningTasksUrl.remove(task.url())
+                mRunningTasksUrl.remove(task.url)
             }
         }
-        PrincipalLife.removeProgressCallback(task as? Task)
+        PrincipalLife.removeProgressCallback(task)
     }
 
     private fun quickDeleteRunningTask(url: String?): Boolean {
@@ -127,10 +126,10 @@ class TaskState {
         synchronized(runningTaskLock) {
             val position = mRunningTasksUrl.indexOf(url)
             if (position > 0 && position < mRunningTasks.size) {
-                if (mRunningTasks[position].url() == url) {
+                if (mRunningTasks[position].url == url) {
                     mRunningTasksUrl.removeAt(position)
                     val task = mRunningTasks.removeAt(position)
-                    PrincipalLife.removeProgressCallback(task as? Task)
+                    PrincipalLife.removeProgressCallback(task)
                     return true
                 }
             }
@@ -142,13 +141,13 @@ class TaskState {
         if (!quickDeleteRunningTask(url)) {
             synchronized(runningTaskLock) {
                 val iterator = mRunningTasks.iterator()
-                var item: ITask? = null
+                var item: Task? = null
                 while (iterator.hasNext()) {
                     item = iterator.next()
-                    if (item.url() == url) {
+                    if (item.url == url) {
                         iterator.remove()
                         mRunningTasksUrl.remove(url)
-                        PrincipalLife.removeProgressCallback(item as? Task)
+                        PrincipalLife.removeProgressCallback(item)
                         break
                     }
                 }
@@ -156,12 +155,12 @@ class TaskState {
         }
     }
 
-    fun exitRunningTask(task: ITask?): Boolean {
+    fun exitRunningTask(task: Task?): Boolean {
         if (task == null) return false
         return mRunningTasks.contains(task)
     }
 
-    fun exitWaitTask(task: ITask?): Boolean {
+    fun exitWaitTask(task: Task?): Boolean {
         if (task == null) return false
         return mWaitTask.contains(task)
     }
@@ -183,8 +182,8 @@ class TaskState {
      */
     fun isInvalidTask(task: Task?): Boolean {
         if (task == null) return true
-        if (task.url().isNullOrBlank()) return true
-        if (task.url() == task.cancel()) return true
+        if (task.url.isNullOrBlank()) return true
+        if (task.url == task.cancelUrl) return true
         return false
     }
 
@@ -193,8 +192,8 @@ class TaskState {
      * @param task Task
      * @return Boolean
      */
-    fun isBreakpointContinuation(task: ITask): Boolean {
-        return task.append()
+    fun isBreakpointContinuation(task: Task): Boolean {
+        return task.append
     }
 
 
@@ -210,15 +209,13 @@ class TaskState {
      * 按顺序从等待队列中取出下载任务
      * @param task Task
      */
-    fun getTaskFromWaitQueue(task: ITask?): ITask? {
-        synchronized(waitTaskLock) {
-            if (mWaitTask.size > 0) {
-                val resultTask = findFirstTaskFromWaitQueue() ?: return task
-                addWaitTask(task)
-                return resultTask
-            }
+    fun getTaskFromWaitQueue(task: Task?): Task? {
+        return if (task == null) {
+            findFirstTaskFromWaitQueue()
+        } else {
+            addWaitTask(task)
+            findFirstTaskFromWaitQueue()
         }
-        return task
     }
 
     /**
@@ -226,17 +223,13 @@ class TaskState {
      * @param task Task
      * @return Boolean
      */
-    fun isCheckMd5(task: ITask): Boolean {
-        return task.md5().orEmpty().isNotBlank()
+    fun isCheckMd5(task: Task): Boolean {
+        return task.md5.orEmpty().isNotBlank()
     }
 
     fun canNextTask(): Boolean {
         if (runningQueueCanAcceptTask() && mWaitTask.size > 0) return true
         return false
-    }
-
-    fun downloadComplete(task: ITask): Boolean {
-        return task.getProgress() == 100
     }
 
     fun debugPrint(){

@@ -110,7 +110,16 @@ class SendTool {
     fun send(callback: Callback?, call: Call?) {
         call ?: return
         callback?:return
-        call.enqueue(callback)
+        call.enqueue(object :Callback{
+            override fun onFailure(call: Call, e: IOException) {
+                callback.onFailure(call,e)
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+               callback.onResponse(call,response)
+            }
+
+        })
     }
 
 

@@ -3,122 +3,35 @@ package com.itg.net.download
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.ITask
 
-abstract class Task : ITask {
-
-    var param: HashMap<String, String>? = null
-    private var tUrl: String? = null
-    var tMd5: String? = null
-    private var tPath: String? = null
-    private var iProgressCallback: IProgressCallback? = null
-    private var rContentLength: Long = 0
-    private var rDownloadSize: Long = 0
-    private var rCancelUrl: String? = null
-    private var tAppend = false
-    private var tBroad = false
-    private var tComponentName: String? = null
-    private var tCostomBroadcast: String? = null
-    private var tExtra: String? = null
-    private var tTryAgainCount = 1 //下载重试次数
+class Task {
+    //请求地址
+    var url: String? = null
+    // 请求文件的md5
+    var md5: String? = null
+    // 下载文件保存地址
+    var path: String? = null
+    // 下载过程中的回调
+    var iProgressCallback: IProgressCallback? = null
+    // 内容长度
+    var contentLength: Long = 0
+    // 下载进度大小
+    var downloadSize: Long = 0
+    // 需要取消的任务url
+    var cancelUrl: String? = null
+    // 是否支持断点续传
+    var append = false
+    // 是否支持下载完成后，发送特定广播
+    var broad = false
+    // 广播组件名称
+    var componentName: String? = null
+    // 自定义广播名称
+    var customBroadcast: String? = null
+    // 携带的额外数据
+    var extra: String? = null
+    // 下载可以尝试的次数
+    var tryAgainCount = 1 //下载重试次数
+    // 创建任务的时间戳
     val uniqueId = System.currentTimeMillis()
 
-    /**
-     * 当前下载任务，如果支持断点续传，append设置为true
-     * @param append Boolean
-     */
-    fun append(append: Boolean): BusinessTask {
-        tAppend = append
-        return this as BusinessTask
-    }
 
-
-    override fun append() = tAppend
-
-    override fun getProgress(): Int {
-        return if (rContentLength == 0L) {
-            -1
-        } else {
-            (100 * rDownloadSize.toDouble() / rContentLength.toDouble()).toInt()
-        }
-    }
-
-    override fun getDownloadSize() = rDownloadSize
-
-    fun setDownloadSize(size: Long) {
-        rDownloadSize = size
-    }
-
-    override fun getContentLength() = rContentLength
-    fun setContentLength(contentLength: Long) {
-        rContentLength = contentLength
-    }
-
-    override fun cancel(cancel: String?) {
-        rCancelUrl = cancel
-    }
-
-    fun cancel() = rCancelUrl
-
-
-    fun url(url: String?): BusinessTask {
-        tUrl = url
-        return this as BusinessTask
-    }
-
-
-    override fun url() = tUrl
-
-    override fun broadcast() = tBroad
-
-    fun broadcast(broad: Boolean) {
-        tBroad = broad
-    }
-
-    fun broadcastComponentName(componentName: String) {
-        tComponentName = componentName
-    }
-
-    override fun broadcastComponentName() = tComponentName
-
-    fun path(path: String): BusinessTask {
-        tPath = path
-        return this as BusinessTask
-    }
-
-    override fun path() = tPath
-
-
-    override fun md5() = tMd5
-
-    fun md5(md5: String?): BusinessTask {
-        tMd5 = md5
-        return this as BusinessTask
-    }
-
-    fun customBroadcast(action: String) {
-        tCostomBroadcast = action
-    }
-
-    override fun customBroadcast() = tCostomBroadcast
-
-    fun extra(extra: String) {
-        tExtra = extra
-    }
-
-    override fun extra() = tExtra
-
-
-    fun tryAgainCount(tryAgainCount: Int = 1): BusinessTask {
-        tTryAgainCount = tryAgainCount
-        return this as BusinessTask
-    }
-
-    override fun tryAgainCount(): Int = tTryAgainCount
-
-    fun progressCallback() = iProgressCallback
-
-
-    fun progressBack(callback: IProgressCallback?): BusinessTask? {
-        iProgressCallback = callback
-        return this as? BusinessTask
-    }
 }

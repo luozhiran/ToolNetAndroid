@@ -1,9 +1,9 @@
 package com.itg.net
 
-import com.itg.net.download.BusinessTask
 import com.itg.net.download.Task
 import com.itg.net.download.DispatchTool
 import com.itg.net.download.TaskCallbackMgr
+import com.itg.net.download.data.TaskBuilder
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.interfaces.ITask
 
@@ -11,8 +11,8 @@ class Download {
 
     val dispatchTool: DispatchTool by lazy { DispatchTool() }
 
-    fun downloadTask(): Task {
-        return BusinessTask()
+    fun taskBuilder(): TaskBuilder {
+        return TaskBuilder()
     }
 
     /**
@@ -37,10 +37,9 @@ class Download {
      * 或者调用DdNet.instance.download.cancel(task),取消任务同时会释放下载器
      * @param task Task?
      */
-    fun removeInnerProgressListener(task: ITask?){
-        if (task is Task) {
-            TaskCallbackMgr.instance.removeProgressCallback(task)
-        }
+    fun removeInnerProgressListener(task: Task?){
+        if (task == null) return
+        TaskCallbackMgr.instance.removeProgressCallback(task)
     }
 
     fun isQueue(url: String): Boolean {
@@ -58,11 +57,11 @@ class Download {
         }
     }
 
-    fun cancel(task: ITask?) {
+    fun cancel(task: Task?) {
         val taskState = dispatchTool.getTaskState()
         if (taskState.exitRunningTask(task)) {
             taskState.deleteRunningTask(task)
-            DdNet.instance.cancelFirstTag(task?.url())
+            DdNet.instance.cancelFirstTag(task?.url)
         } else if (taskState.exitWaitTask(task)) {
             taskState.deleteWaitTask(task)
         }

@@ -8,6 +8,7 @@ import com.itg.net.download.interfaces.Dispatch
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.request.BreakpointContinuationRequest
 import com.itg.net.download.request.DirectRequest
+import com.itg.net.tools.TaskTools
 
 
 class DispatchTool : Dispatch {
@@ -93,11 +94,11 @@ class DispatchTool : Dispatch {
      * @param task DTask
      */
     private fun logisticsDownload(task: Task) {
-        task.tryAgainCount(task.tryAgainCount() - 1)
-        task.progressCallback()?.onConnecting(task)
+        task.tryAgainCount = task.tryAgainCount - 1
+        task.iProgressCallback?.onConnecting(task)
         DirectRequest(task, taskStateInstance)
-            .setFailCallback { tk, msg -> handleResult(tk as Task, DOWNLOAD_FILE, msg) }
-            .setSuccessCallback { tk, msg -> handleResult(tk as Task, DOWNLOAD_SUCCESS, msg) }
+            .setFailCallback { tk, msg -> handleResult(tk, DOWNLOAD_FILE, msg) }
+            .setSuccessCallback { tk, msg -> handleResult(tk , DOWNLOAD_SUCCESS, msg) }
             .start()
     }
 
@@ -142,25 +143,26 @@ class DispatchTool : Dispatch {
      * @param task DTask
      */
     private fun logisticsBreakpointContinuation(task: Task){
-        task.tryAgainCount(task.tryAgainCount() - 1)
-        task.progressCallback()?.onConnecting(task)
+        task.tryAgainCount = task.tryAgainCount - 1
+        task.iProgressCallback?.onConnecting(task)
         BreakpointContinuationRequest(task, taskStateInstance)
-            .setFailCallback { tk, msg -> handleResult(tk as Task, DOWNLOAD_FILE, msg) }
-            .setSuccessCallback { tk, msg -> handleResult(tk as Task, DOWNLOAD_SUCCESS, msg) }
+            .setFailCallback { tk, msg -> handleResult(tk, DOWNLOAD_FILE, msg) }
+            .setSuccessCallback { tk, msg -> handleResult(tk, DOWNLOAD_SUCCESS, msg) }
             .start()
     }
 
 
     private fun handleResult(task: Task, type: Int, tag: String) {
         if (type == DOWNLOAD_FILE) {
-            if (task.tryAgainCount() > 0) {
-                task.progressCallback()?.onFail(ERROR_TAG_11, task)
+            if (task.tryAgainCount > 0) {
+                task.iProgressCallback?.onFail(ERROR_TAG_11, task)
             } else {
-                task.progressCallback()?.onFail(tag, task)
+                task.iProgressCallback?.onFail(tag, task)
                 taskStateInstance.deleteRunningTask(task)
             }
         } else if (type == DOWNLOAD_SUCCESS) {
-            task.progressCallback()?.onProgress(task)
+            val progress = TaskTools.getDownloadProgress(task)
+            task.iProgressCallback?.onProgress(task, progress == 100)
             taskStateInstance.deleteRunningTask(task)
         }
         sendMsg(task, type)
@@ -188,10 +190,11 @@ class DispatchTool : Dispatch {
     private fun isAgainDownload(obj:Any?):Boolean{
         if (obj == null) return false
         val task = obj as Task
-        return task.tryAgainCount() <= 0
+        return task.tryAgainCount <= 0
     }
 
     fun getTaskState(): TaskState {
         return taskStateInstance
     }
+
 }

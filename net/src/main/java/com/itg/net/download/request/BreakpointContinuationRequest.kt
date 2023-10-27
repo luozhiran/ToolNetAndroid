@@ -16,16 +16,13 @@ import java.io.*
 class BreakpointContinuationRequest(private val task: Task, taskStateInstance: TaskState) : BaseRequest(task,taskStateInstance) {
 
     private fun getBreakpointContinuationBuilder(task: Task, range:String?) : ParamsBuilder {
-        val builder = DdNet.instance.builder(ModeType.Get).url(task.url())
+        val builder = DdNet.instance.builder(ModeType.Get).url(task.url)
         builder.addHeader("RANGE", "bytes=${range}")
-        task.param?.onEach { value ->
-            builder.addHeader(value.key, value.value)
-        }
         return builder
     }
 
     private fun getLocalFileRange(fileSize:Long?):String{
-        val file = File(task.path() + ".tmp")
+        val file = File(task.path + ".tmp")
         return if (file.exists()) {
             "${file.length()}-${fileSize ?: 0 - 1}"
         } else {

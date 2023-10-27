@@ -2,6 +2,7 @@ package com.itg.net.download
 
 import android.util.Log
 import com.itg.net.download.interfaces.IProgressCallback
+import com.itg.net.tools.TaskTools
 
 /**
  * 内部使用的下载回调
@@ -24,7 +25,7 @@ internal class TaskCallbackMgr {
     fun loop(task: Task?) {
         if (task == null) return
         val uniqueId = getDownloadCallbackUniqueId(task)
-        progressCallbackMap[uniqueId]?.onProgress(task)
+        progressCallbackMap[uniqueId]?.onProgress(task, TaskTools.getDownloadProgress(task) == 100)
 
     }
 
@@ -36,8 +37,7 @@ internal class TaskCallbackMgr {
     }
 
     private fun getDownloadCallbackUniqueId(task: Task): String {
-//        return "${task.uniqueId}:${task.url()}"
-        return task.url() + ""
+        return task.url ?: ""
     }
 
     fun setProgressCallback(task: Task, progressCallback: IProgressCallback) {

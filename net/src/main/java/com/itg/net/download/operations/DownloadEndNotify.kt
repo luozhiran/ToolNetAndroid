@@ -14,55 +14,56 @@ import com.itg.net.download.interfaces.ITask
 object DownloadEndNotify {
 
     @JvmStatic
-    fun connectNotify(task: ITask?) {
+    fun connectNotify(task: Task?) {
         if (task == null) return
-        DdNet.instance.callbackMgr.loopConnecting(task as Task)
+        DdNet.instance.callbackMgr.loopConnecting(task)
         TaskCallbackMgr.instance.loopConnecting(task)
     }
 
     @JvmStatic
-    fun progressNotify(task: ITask?) {
+    fun progressNotify(task: Task?) {
         if (task == null) return
-        DdNet.instance.callbackMgr.loop(task as Task)
+        DdNet.instance.callbackMgr.loop(task)
         TaskCallbackMgr.instance.loop(task)
     }
 
     @JvmStatic
-    fun completeNotify(task: ITask?) {
+    fun completeNotify(task: Task?) {
         progressNotify(task)
         sendBroadcast(task)
     }
 
     @JvmStatic
-    private fun sendBroadcast(task: ITask?) {
+    private fun sendBroadcast(task: Task?) {
         if (task == null) return
         var intent: Intent? = null
-        if (task.customBroadcast().orEmpty().isNotBlank()) {
-            intent = Intent(task.customBroadcast())
-        } else if (task.broadcast()) {
+        if (task.customBroadcast.orEmpty().isNotBlank()) {
+            intent = Intent(task.customBroadcast)
+        } else if (task.broad) {
             intent = Intent(BROAD_ACTION)
         }
         intent?.let { it ->
-            if (Build.VERSION.SDK_INT >= 26 && task.broadcastComponentName().orEmpty()
+            if (Build.VERSION.SDK_INT >= 26 && task.componentName.orEmpty()
                     .isNotBlank()
             ) {
                 it.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)//加上这句话，可以解决在android8.0系统以上2个module之间发送广播接收不到的问题
                 it.component = DdNet.instance.ddNetConfig.pkgName?.let {
-                    task.broadcastComponentName()?.let { it1 -> ComponentName(it, it1) }
+                    task.componentName?.let { it1 -> ComponentName(it, it1) }
                 }
             }
-            it.putExtra("url", task.url())
-            it.putExtra("file", task.path())
-            it.putExtra("extra", task.extra())
+            it.putExtra("url", task.url)
+            it.putExtra("file", task.path)
+            it.putExtra("extra", task.extra)
             DdNet.instance.ddNetConfig.application?.sendBroadcast(it)
         }
     }
 
 
     @JvmStatic
-    fun failNotify(task: ITask?, msg: String?) {
-        if (task?.getProgress() ?: -1 > 0 && ERROR_TAG_3 != msg) {
-            DdNet.instance.callbackMgr.loop(task as Task)
+    fun failNotify(task: Task?, msg: String?) {
+        if (task == null) return
+        if (task.contentLength > 0L && ERROR_TAG_3 != msg ) {
+            DdNet.instance.callbackMgr.loop(task)
             TaskCallbackMgr.instance.loop(task)
         }
         if (ERROR_TAG_11 != msg) { // 重试下载，不抛给业务

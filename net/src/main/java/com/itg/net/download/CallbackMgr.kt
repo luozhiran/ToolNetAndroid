@@ -1,6 +1,7 @@
 package com.itg.net.download
 
 import com.itg.net.download.interfaces.IProgressCallback
+import com.itg.net.tools.TaskTools
 
 class CallbackMgr {
     private val lock: Any = Any()
@@ -39,7 +40,7 @@ class CallbackMgr {
     fun loop(task:Task){
         synchronized(lock) {
             getTempArray().forEach {
-                it.onProgress(task)
+                it.onProgress(task,TaskTools.getDownloadProgress(task) == 100)
             }
         }
     }
