@@ -3,7 +3,7 @@ package com.itg.net.download
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
-import com.itg.net.download.data.TaskState
+import com.itg.net.download.request.TaskState
 import com.itg.net.download.interfaces.Dispatch
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.request.BreakpointContinuationRequest
@@ -50,13 +50,9 @@ class DispatchTool : Dispatch {
     /**
      * 任务有重试次数，在一次上次失败的任务
      */
-    private fun tryAgainDownloadTask(preTask: Task, progressCallback: IProgressCallback?) {
+    private fun tryAgainDownloadTask(preTask: Task) {
         synchronized(this) {
             if (taskStateInstance.exitRunningTask(preTask)) {
-                progressCallback?.let {
-                    //把外部的回调还原给任务
-                    TaskCallbackMgr.instance.setProgressCallback(preTask, it)
-                }
                 if (taskStateInstance.isBreakpointContinuation(preTask)) {
                     logisticsBreakpointContinuation(preTask)
                 } else {
@@ -73,7 +69,7 @@ class DispatchTool : Dispatch {
             if (taskStateInstance.runningQueueCanAcceptTask()) {
                 immediatelyDownload(task)
             } else {
-                pendingDownload()
+                pendingDownload(task)
             }
         }
     }
@@ -108,7 +104,8 @@ class DispatchTool : Dispatch {
     /**
      * 等待未来下载数据
      */
-    private fun pendingDownload() {
+    private fun pendingDownload(task: Task) {
+        taskStateInstance.addWaitTask(task)
         if (taskStateInstance.canNextTask()) {
             sendMsg(null, DOWNLOAD_TASK)
         }
@@ -123,7 +120,7 @@ class DispatchTool : Dispatch {
             if (taskStateInstance.runningQueueCanAcceptTask()) {
                 immediatelyBreakpointContinuationRequest(task)
             } else {
-                pendingDownload()
+                pendingDownload(task)
             }
         }
     }
@@ -155,27 +152,21 @@ class DispatchTool : Dispatch {
 
 
     private fun handleResult(task: Task, type: Int, tag: String) {
-        var tempTag = tag
-        var tempTask:TempTask?=null
         if (type == DOWNLOAD_FILE) {
             if (task.tryAgainCount() > 0) {
-                //如果重试次数没有用完，需要保存一个回到最外层的应用，在重试下载开始后，置空这个回调
-                tempTask = TempTask(task, TaskCallbackMgr.instance.getProgressCallback(task))
                 task.progressCallback()?.onFail(ERROR_TAG_11, task)
             } else {
-                tempTask = TempTask()
+                task.progressCallback()?.onFail(tag, task)
                 taskStateInstance.deleteRunningTask(task)
-                task.progressCallback()?.onFail(tempTag, task)
             }
         } else if (type == DOWNLOAD_SUCCESS) {
-            tempTask = TempTask()
-            taskStateInstance.deleteRunningTask(task)
             task.progressCallback()?.onProgress(task)
+            taskStateInstance.deleteRunningTask(task)
         }
-        sendMsg(tempTask, type)
+        sendMsg(task, type)
     }
 
-    private fun sendMsg(task: TempTask?, type: Int) {
+    private fun sendMsg(task: Task?, type: Int) {
         val msg = Message.obtain()
         msg.obj = task
         msg.what = type
@@ -184,8 +175,8 @@ class DispatchTool : Dispatch {
 
     private fun execNextDownloadRequest(message: Message): Boolean {
         synchronized(this) {
-            if (message.what == DOWNLOAD_FILE) {
-                handleDownloadFail(message.obj as? TempTask?)
+            if (message.what == DOWNLOAD_FILE && isAgainDownload(message.obj)) {
+                tryAgainDownloadTask(message.obj as Task)
             } else { // DOWNLOAD_TASK CANCEL_TASK DOWNLOAD_FILE  DOWNLOAD_SUCCESS
                 downloadNextTask()
             }
@@ -194,18 +185,10 @@ class DispatchTool : Dispatch {
         return true
     }
 
-    private fun handleDownloadFail(task: TempTask?) {
-        if (task?.task == null) {
-            downloadNextTask()
-            return
-        }
-        val realTask = task.task
-        val realProgressCallback = task.iProgressCallback
-        if (realTask.tryAgainCount() <= 0) {
-            downloadNextTask()
-        } else { // 重试下载
-            tryAgainDownloadTask(realTask, realProgressCallback)
-        }
+    private fun isAgainDownload(obj:Any?):Boolean{
+        if (obj == null) return false
+        val task = obj as Task
+        return task.tryAgainCount() <= 0
     }
 
     fun getTaskState(): TaskState {

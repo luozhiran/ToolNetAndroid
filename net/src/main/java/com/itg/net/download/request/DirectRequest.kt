@@ -1,9 +1,7 @@
 package com.itg.net.download.request
 
 import com.itg.net.download.*
-import com.itg.net.download.data.TaskState
 import com.itg.net.download.implement.OnDownloadListenerImpl
-import okhttp3.Call
 
 /**
  * 直接下载任务
@@ -23,6 +21,6 @@ class DirectRequest(private val task: Task, taskStateInstance: TaskState) : Base
         }, onFailure = { _, ioException ->
             failureCallback?.invoke(task,ioException.message.toString())
         })
-        getBuilder().autoCancel((task as? BusinessTask)?.getActivity()).send(okHttpCallback,task)
+        getBuilder().send(okHttpCallback,task)
     }
 }

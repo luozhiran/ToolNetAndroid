@@ -4,10 +4,8 @@ package com.itg.net.download.request
 import com.itg.net.DdNet
 import com.itg.net.ModeType
 import com.itg.net.download.*
-import com.itg.net.download.data.TaskState
 import com.itg.net.download.implement.OnDownloadListenerImpl
 import com.itg.net.reqeust.model.params.ParamsBuilder
-import okhttp3.Call
 import java.io.*
 
 /**
@@ -15,7 +13,7 @@ import java.io.*
  * @property task DTask
  * @constructor
  */
-class BreakpointContinuationRequest(private val task: Task, taskStateInstance:TaskState) : BaseRequest(task,taskStateInstance) {
+class BreakpointContinuationRequest(private val task: Task, taskStateInstance: TaskState) : BaseRequest(task,taskStateInstance) {
 
     private fun getBreakpointContinuationBuilder(task: Task, range:String?) : ParamsBuilder {
         val builder = DdNet.instance.builder(ModeType.Get).url(task.url())
@@ -59,7 +57,7 @@ class BreakpointContinuationRequest(private val task: Task, taskStateInstance:Ta
         }, onFailure = { _, iOException ->
             failureCallback?.invoke(task,iOException.message.toString())
         })
-        getBuilder().autoCancel((task as? BusinessTask)?.getActivity()).send(okHttpCallback,task)
+        getBuilder().send(okHttpCallback,task)
     }
 
 

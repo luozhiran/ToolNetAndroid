@@ -54,7 +54,7 @@ class Get : GetGenerator() {
             tag,
             null
         ) { builder -> builder.get() }
-        sendTool.send(response, call, task)
+        sendTool.send(response, call)
     }
 
 

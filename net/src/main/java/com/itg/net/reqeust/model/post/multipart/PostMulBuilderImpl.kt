@@ -39,7 +39,6 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
             override fun send(callback: DdCallback?) {}
 
             override fun send(handler: Handler?, what: Int, errorWhat: Int) {}
-            override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {}
         }
     }
     private val postJson: PostJsonBuilder by lazy {
@@ -49,7 +48,6 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
             override fun send(callback: DdCallback?) {}
 
             override fun send(handler: Handler?, what: Int, errorWhat: Int) {}
-            override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {}
         }
     }
     private val postContent: PostContentBuilder by lazy {
@@ -57,14 +55,12 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
             override fun autoCancel(activity: Activity?): PostContentBuilder = this
             override fun send(callback: DdCallback?) {}
             override fun send(handler: Handler?, what: Int, errorWhat: Int) {}
-            override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {}
         }
     }
     private val postForm:PostFormBuilder by lazy { object : PostFormBuilder(){
         override fun autoCancel(activity: Activity?): PostFormBuilder = this
         override fun send(callback: DdCallback?) {}
         override fun send(handler: Handler?, what: Int, errorWhat: Int) {}
-        override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {}
     } }
 
     override fun addFile(file: File?): PostMulBuilderImpl {

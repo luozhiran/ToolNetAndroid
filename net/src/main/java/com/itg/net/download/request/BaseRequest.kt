@@ -3,7 +3,6 @@ package com.itg.net.download.request
 import com.itg.net.DdNet
 import com.itg.net.ModeType
 import com.itg.net.download.*
-import com.itg.net.download.data.TaskState
 import com.itg.net.download.interfaces.ITask
 import com.itg.net.reqeust.model.params.ParamsBuilder
 import com.itg.net.tools.CheckTools

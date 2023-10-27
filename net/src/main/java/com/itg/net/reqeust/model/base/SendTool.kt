@@ -7,6 +7,7 @@ import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
 import com.itg.net.download.Task
+import com.itg.net.download.TaskCallbackMgr
 import com.itg.net.download.operations.PrincipalLife
 import com.itg.net.reqeust.MyLifecycleEventObserver
 import com.itg.net.reqeust.model.post.content.PostContent
@@ -14,10 +15,10 @@ import okhttp3.*
 import java.io.IOException
 
 class SendTool {
-    private val principalLife by lazy { PrincipalLife() }
+    private var activity:Activity? = null
 
     fun autoCancel(activity: Activity?): SendTool {
-        principalLife.addActivity(activity)
+        this.activity = activity
         return this
     }
 
@@ -54,13 +55,13 @@ class SendTool {
 
     fun send(callback: DdCallback?, call: Call?) {
         if (call == null) callback?.onFailure("url is error,please check url")
-        principalLife.registerEvent(call)
+        PrincipalLife.observeActivityLife(call,this.activity)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
                     callback?.onFailure(e.message)
                 }
-                principalLife.unregisterEvent()
+                PrincipalLife.removeCall(call)
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -68,7 +69,7 @@ class SendTool {
                     callback?.onResponse(response.body?.string(), response.code)
                 }
                 response.body?.close()
-                principalLife.unregisterEvent()
+                PrincipalLife.removeCall(call)
             }
         })
     }
@@ -80,7 +81,7 @@ class SendTool {
             msg.obj = "url is error,please check url"
             handler?.sendMessage(msg)
         }
-        principalLife.registerEvent(call)
+        PrincipalLife.observeActivityLife(call,this.activity)
         call?.enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {
                 if (!call.isCanceled()) {
@@ -89,7 +90,7 @@ class SendTool {
                     msg.obj = e.message
                     handler?.sendMessage(msg)
                 }
-                principalLife.unregisterEvent()
+                PrincipalLife.removeCall(call)
             }
 
             override fun onResponse(call: Call, response: Response) {
@@ -101,28 +102,15 @@ class SendTool {
                     handler?.sendMessage(msg)
                 }
                 response.body?.close()
-                principalLife.unregisterEvent()
+                PrincipalLife.removeCall(call)
             }
         })
     }
 
-    fun send(callback: Callback?, call: Call?,task:Task?) {
+    fun send(callback: Callback?, call: Call?) {
         call ?: return
         callback?:return
-        task?:return
-        principalLife.registerEvent(call,task)
-        call.enqueue(object : Callback{
-            override fun onFailure(call: Call, e: IOException) {
-                callback.onFailure(call,e)
-                principalLife.unregisterEvent(task)
-            }
-
-            override fun onResponse(call: Call, response: Response) {
-                callback.onResponse(call,response)
-                principalLife.unregisterEvent(task)
-            }
-
-        })
+        call.enqueue(callback)
     }
 
 

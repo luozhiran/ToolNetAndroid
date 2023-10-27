@@ -33,11 +33,4 @@ class PostMul : PostMulGenerator() {
         sendTool.send(handler,what,errorWhat,call)
     }
 
-    override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {
-        val call = sendTool.combineParamsAndRCall(getHeader(),getUrl(),tag,getRequestBody())
-        sendTool.send(response,call,callback)
-    }
-
-
-
 }

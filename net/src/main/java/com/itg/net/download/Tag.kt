@@ -20,3 +20,5 @@ const val ERROR_TAG_9 = "response.code() not is 200"
 const val ERROR_TAG_10 = "相同请求地址已在下载队列中,禁止重复请求"
 const val ERROR_TAG_11 = "即将重试下载任务"
 const val ERROR_TAG_12 = "任务下载成功"
+
+const val DEBUG_TAG="debug-tag"

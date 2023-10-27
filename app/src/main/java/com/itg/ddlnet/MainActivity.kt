@@ -37,15 +37,16 @@ class MainActivity : AppCompatActivity() {
         DdNet.instance.download.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
             for (i in 0.. 10) {
-                Thread.sleep(1000)
+//                Thread.sleep(1000)
                 Log.e("MainActivity","延时$i")
                 val path = "${filesDir}/$i.zip";
                 task = DdNet.instance.download
                     .downloadTask()
                     .path(path)
-                    .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
+                    .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690${i}.zip")
                     .tryAgainCount(3)
                     .prepareEnd()
+                    .autoCancel(this)
                     .setProgressListener(object : IProgressCallback{
                         override fun onConnecting(task: ITask?) {
                             Log.e("MainActivity","onConnecting $i")
@@ -53,6 +54,7 @@ class MainActivity : AppCompatActivity() {
 
                         override fun onProgress(task: ITask?) {
                             if (task?.getProgress() == 100) {
+
                                 Log.e("MainActivity", "download is success $path $i ${File(task.path()?:"").exists()}")
                             }
                         }

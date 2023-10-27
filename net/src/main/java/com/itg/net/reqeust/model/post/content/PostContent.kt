@@ -6,6 +6,7 @@ import android.os.Message
 import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
+import com.itg.net.download.Task
 import com.itg.net.reqeust.MyLifecycleEventObserver
 import com.itg.net.reqeust.model.base.SendTool
 import okhttp3.Call
@@ -30,11 +31,6 @@ class PostContent:PostContentGenerator() {
     override fun send(handler: Handler?, what: Int, errorWhat: Int) {
         val call = sendTool.combineParamsAndRCall(getHeader(),getUrl(),tag,getRequestBody())
         sendTool.send(handler,what,errorWhat,call)
-    }
-
-    override fun send(response: Callback?, callback: ((Call?) -> Unit)?) {
-        val call = sendTool.combineParamsAndRCall(getHeader(),getUrl(),tag,getRequestBody())
-        sendTool.send(response,call,callback)
     }
 
 }

@@ -9,5 +9,5 @@ import okhttp3.Callback
 interface SentBuilder {
     fun send(callback: DdCallback?)
     fun send(handler: Handler?, what: Int, errorWhat: Int)
-    fun send(response: Callback?,task:Task?)
+    fun send(response: Callback?,task:Task?){}
 }

@@ -1,8 +1,12 @@
-package com.itg.net.download.data
+package com.itg.net.download.request
 
+import android.util.Log
 import com.itg.net.DdNet
+import com.itg.net.download.DEBUG_TAG
 import com.itg.net.download.Task
+import com.itg.net.download.data.LockData
 import com.itg.net.download.interfaces.ITask
+import com.itg.net.download.operations.PrincipalLife
 
 class TaskState {
 
@@ -20,12 +24,22 @@ class TaskState {
     private val mRunningTasksUrl: MutableList<String?> by lazy { mutableListOf() }
 
 
-    private fun addWaitTask(task: ITask?) {
-        if (task == null) return
-        if (exitWaitUrl(task.url())) return
-        if (mWaitTask.add(task)) {
-            mWaitQueueUrl.add(task.url())
+    fun addWaitTask(task: ITask?):Boolean {
+        if (task == null) return false
+        synchronized(waitTaskLock) {
+            if (exitWaitUrl(task.url())) {
+                // 添加下载任务失败时，需要删除创建任务时生成的全局变量
+                PrincipalLife.removeProgressCallback(task as? Task)
+                return false
+            }
+            if (mWaitTask.add(task)) {
+                mWaitQueueUrl.add(task.url())
+                return true
+            }
         }
+        // 添加下载任务失败时，需要删除创建任务时生成的全局变量
+        PrincipalLife.removeProgressCallback(task as? Task)
+        return false
     }
 
     fun deleteWaitTask(task: ITask?) {
@@ -34,6 +48,7 @@ class TaskState {
             if (mWaitTask.remove(task)) {
                 mWaitQueueUrl.remove(task.url())
             }
+            PrincipalLife.removeProgressCallback(task as? Task)
         }
     }
 
@@ -47,6 +62,7 @@ class TaskState {
                     if (item.url() == url) {
                         iterator.remove()
                         mWaitQueueUrl.remove(url)
+                        PrincipalLife.removeProgressCallback(item as? Task)
                         break
                     }
                 }
@@ -61,7 +77,8 @@ class TaskState {
             if (position > 0 && position < mWaitTask.size) {
                 if (mWaitTask[position].url() == url) {
                     mWaitQueueUrl.removeAt(position)
-                    mRunningTasks.removeAt(position)
+                    val task = mWaitTask.removeAt(position)
+                    PrincipalLife.removeProgressCallback(task as? Task)
                     return true
                 }
             }
@@ -80,12 +97,18 @@ class TaskState {
     fun addRunningTask(task: ITask?): Boolean {
         if (task == null) return false
         synchronized(runningTaskLock) {
-            if (mRunningTasksUrl.contains(task.url())) return false
+            if (mRunningTasksUrl.contains(task.url())) {
+                // 添加下载任务失败时，需要删除创建任务时生成的全局变量
+                PrincipalLife.removeProgressCallback(task as? Task)
+                return false
+            }
             if (mRunningTasks.add(task)) {
                 mRunningTasksUrl.add(task.url())
                 return true
             }
         }
+        // 添加下载任务失败时，需要删除创建任务时生成的全局变量
+        PrincipalLife.removeProgressCallback(task as? Task)
         return false
     }
 
@@ -95,8 +118,8 @@ class TaskState {
             if (mRunningTasks.remove(task)) {
                 mRunningTasksUrl.remove(task.url())
             }
-
         }
+        PrincipalLife.removeProgressCallback(task as? Task)
     }
 
     private fun quickDeleteRunningTask(url: String?): Boolean {
@@ -106,7 +129,8 @@ class TaskState {
             if (position > 0 && position < mRunningTasks.size) {
                 if (mRunningTasks[position].url() == url) {
                     mRunningTasksUrl.removeAt(position)
-                    mRunningTasks.removeAt(position)
+                    val task = mRunningTasks.removeAt(position)
+                    PrincipalLife.removeProgressCallback(task as? Task)
                     return true
                 }
             }
@@ -124,6 +148,7 @@ class TaskState {
                     if (item.url() == url) {
                         iterator.remove()
                         mRunningTasksUrl.remove(url)
+                        PrincipalLife.removeProgressCallback(item as? Task)
                         break
                     }
                 }
@@ -211,6 +236,10 @@ class TaskState {
     }
 
     fun downloadComplete(task: ITask): Boolean {
-        return task.getProgress() != 100
+        return task.getProgress() == 100
+    }
+
+    fun debugPrint(){
+        Log.i(DEBUG_TAG,"下载队列： 等待任务队列：${mWaitTask.size}，正在下载队列：${mRunningTasks.size}")
     }
 }
