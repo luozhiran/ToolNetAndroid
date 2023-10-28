@@ -1,18 +1,16 @@
 package com.itg.net.download.request
 
 import android.util.Log
-import com.itg.net.DdNet
-import com.itg.net.download.DEBUG_TAG
-import com.itg.net.download.ERROR_TAG_11
+import com.itg.net.Net
+import com.itg.net.download.data.DEBUG_TAG
+import com.itg.net.download.data.ERROR_TAG_11
 import com.itg.net.download.Task
 import com.itg.net.download.data.LockData
-import com.itg.net.download.interfaces.ITask
 import com.itg.net.download.operations.HoldActivityCallbackMap
-import com.itg.net.download.operations.PrincipalLife
 
 class TaskState {
 
-    private val maxDownloadSize = DdNet.instance.ddNetConfig.maxDownloadNum
+    private val maxDownloadSize = Net.instance.ddNetConfig.maxDownloadNum
 
     private val runningTaskLock by lazy { LockData() }
     private val waitTaskLock by lazy { LockData() }

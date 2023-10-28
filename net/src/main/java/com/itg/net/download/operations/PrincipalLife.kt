@@ -6,8 +6,7 @@ import androidx.activity.ComponentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.itg.net.download.DEBUG_TAG
-import com.itg.net.download.Task
+import com.itg.net.download.data.DEBUG_TAG
 import com.itg.net.download.data.LockData
 import com.itg.net.tools.ThreadTool
 import okhttp3.Call

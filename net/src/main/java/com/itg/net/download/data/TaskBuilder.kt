@@ -5,14 +5,11 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import com.google.android.material.transition.platform.Hold
-import com.itg.net.DdNet
+import com.itg.net.Download
 import com.itg.net.download.*
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.operations.DownloadEndNotify
 import com.itg.net.download.operations.HoldActivityCallbackMap
-import com.itg.net.download.operations.PrincipalLife
-import com.itg.net.download.request.TaskState
 
 class TaskBuilder {
     private val task by lazy { Task() }
@@ -32,7 +29,7 @@ class TaskBuilder {
             }
 
             override fun onFail(error: String?, task: Task) {
-                if (DdNet.instance.download.dispatchTool.getTaskState()
+                if (Download.instance.dispatchTool.getTaskState()
                         .isTryAgainDownload(error)
                 ) {
                     Log.e(DEBUG_TAG,"重新开始下载")
@@ -87,7 +84,7 @@ class TaskBuilder {
 
 
     fun start(): Task {
-        val taskState = DdNet.instance.download.dispatchTool.getTaskState()
+        val taskState = Download.instance.dispatchTool.getTaskState()
         // 校验任务是否为无效任务
         if (taskState.isInvalidTask(task)) {
             holdActivityRef?.onFail(ERROR_TAG_7, task)
@@ -105,12 +102,13 @@ class TaskBuilder {
         // 下载任务是否启动断点续传
         if (taskState.isBreakpointContinuation(task)) {
             task.iProgressCallback = iProgressCallback
-            DdNet.instance.download.dispatchTool.appendDownload(task)
+            Download.instance.dispatchTool.appendDownload(task)
             return task
         }
         task.iProgressCallback = iProgressCallback
-        DdNet.instance.download.dispatchTool.download(task)
+        Download.instance.dispatchTool.download(task)
         return task
     }
+
 
 }

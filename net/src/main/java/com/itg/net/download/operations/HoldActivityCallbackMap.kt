@@ -1,7 +1,7 @@
 package com.itg.net.download.operations
 
 import android.util.Log
-import com.itg.net.download.DEBUG_TAG
+import com.itg.net.download.data.DEBUG_TAG
 import com.itg.net.download.Task
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.tools.TaskTools

@@ -4,24 +4,24 @@ import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import com.itg.net.BROAD_ACTION
-import com.itg.net.DdNet
+import com.itg.net.Download
+import com.itg.net.Net
 import com.itg.net.download.Task
-import com.itg.net.download.ERROR_TAG_11
-import com.itg.net.download.ERROR_TAG_3
+import com.itg.net.download.data.ERROR_TAG_3
 
 object DownloadEndNotify {
 
     @JvmStatic
     fun connectNotify(task: Task?) {
         if (task == null) return
-        DdNet.instance.callbackMgr.loopConnecting(task)
+        Download.instance.globalDownloadProgressCache.execAllConnecting(task)
         HoldActivityCallbackMap.loopConnecting(task)
     }
 
     @JvmStatic
     fun progressNotify(task: Task?) {
         if (task == null) return
-        DdNet.instance.callbackMgr.loop(task)
+        Download.instance.globalDownloadProgressCache.execAllOnProgress(task)
         HoldActivityCallbackMap.loop(task)
     }
 
@@ -44,14 +44,14 @@ object DownloadEndNotify {
                     .isNotBlank()
             ) {
                 it.addFlags(Intent.FLAG_ACTIVITY_PREVIOUS_IS_TOP)//加上这句话，可以解决在android8.0系统以上2个module之间发送广播接收不到的问题
-                it.component = DdNet.instance.ddNetConfig.pkgName?.let {
+                it.component = Net.instance.ddNetConfig.pkgName?.let {
                     task.componentName?.let { it1 -> ComponentName(it, it1) }
                 }
             }
             it.putExtra("url", task.url)
             it.putExtra("file", task.path)
             it.putExtra("extra", task.extra)
-            DdNet.instance.ddNetConfig.application?.sendBroadcast(it)
+            Net.instance.ddNetConfig.application?.sendBroadcast(it)
         }
     }
 
@@ -59,10 +59,10 @@ object DownloadEndNotify {
     @JvmStatic
     fun failNotify(task: Task, msg: String?) {
         if (task.contentLength > 0L && ERROR_TAG_3 != msg ) {
-            DdNet.instance.callbackMgr.loop(task)
+            Download.instance.globalDownloadProgressCache.execAllOnProgress(task)
             HoldActivityCallbackMap.loop(task)
         }
-        DdNet.instance.callbackMgr.loopFail(msg ?: "", task )
+        Download.instance.globalDownloadProgressCache.execAllOnFail(msg ?: "", task )
         HoldActivityCallbackMap.loopFail(msg ?: "", task )
     }
 

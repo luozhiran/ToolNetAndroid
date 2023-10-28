@@ -1,14 +1,14 @@
 package com.itg.ddlnet
 
 import android.app.Application
-import com.itg.net.DdNet
+import com.itg.net.Net
 
 class App:Application() {
 
     override fun onCreate() {
         super.onCreate()
         
-        DdNet.instance.ddNetConfig
+        Net.instance.ddNetConfig
             .app(this)
             .setGlobalParams("ab","bai")
             .setGlobalParams("43","af")

@@ -1,11 +1,12 @@
 package com.itg.net.download.request
 
 
-import com.itg.net.DdNet
+import com.itg.net.Net
 import com.itg.net.ModeType
 import com.itg.net.download.*
+import com.itg.net.download.data.ERROR_TAG_1
 import com.itg.net.download.implement.OnDownloadListenerImpl
-import com.itg.net.reqeust.model.params.ParamsBuilder
+import com.itg.net.reqeust.base.ParamsBuilder
 import java.io.*
 
 /**
@@ -16,7 +17,7 @@ import java.io.*
 class BreakpointContinuationRequest(private val task: Task, taskStateInstance: TaskState) : BaseRequest(task,taskStateInstance) {
 
     private fun getBreakpointContinuationBuilder(task: Task, range:String?) : ParamsBuilder {
-        val builder = DdNet.instance.builder(ModeType.Get).url(task.url)
+        val builder = Net.instance.builder(ModeType.Get).url(task.url)
         builder.addHeader("RANGE", "bytes=${range}")
         return builder
     }
@@ -35,7 +36,7 @@ class BreakpointContinuationRequest(private val task: Task, taskStateInstance: T
             if (response.code == 206) {
                 handleResponse(response)
             } else {
-                failureCallback?.invoke(task,ERROR_TAG_1)
+                failureCallback?.invoke(task, ERROR_TAG_1)
             }
         }, onFailure = { _, ioException ->
             failureCallback?.invoke(task,ioException.message.toString())
