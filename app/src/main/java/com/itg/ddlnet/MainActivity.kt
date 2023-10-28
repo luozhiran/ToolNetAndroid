@@ -42,8 +42,7 @@ class MainActivity : AppCompatActivity() {
                     .path(path)
                     .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690${i}.zip")
                     .tryAgainCount(3)
-                    .autoRemote(this)
-                    .stealth()
+                    .autoRemoveActivity(this)
                     .setDownloadListener(object : IProgressCallback {
                         override fun onConnecting(task: Task) {
                             Log.e("MainActivity", "onConnecting $i")

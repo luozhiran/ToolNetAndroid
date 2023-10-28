@@ -8,8 +8,6 @@ import com.itg.net.DdNet
 import com.itg.net.download.Task
 import com.itg.net.download.ERROR_TAG_11
 import com.itg.net.download.ERROR_TAG_3
-import com.itg.net.download.TaskCallbackMgr
-import com.itg.net.download.interfaces.ITask
 
 object DownloadEndNotify {
 
@@ -17,25 +15,24 @@ object DownloadEndNotify {
     fun connectNotify(task: Task?) {
         if (task == null) return
         DdNet.instance.callbackMgr.loopConnecting(task)
-        TaskCallbackMgr.instance.loopConnecting(task)
+        HoldActivityCallbackMap.loopConnecting(task)
     }
 
     @JvmStatic
     fun progressNotify(task: Task?) {
         if (task == null) return
         DdNet.instance.callbackMgr.loop(task)
-        TaskCallbackMgr.instance.loop(task)
+        HoldActivityCallbackMap.loop(task)
     }
 
     @JvmStatic
-    fun completeNotify(task: Task?) {
+    fun completeNotify(task: Task) {
         progressNotify(task)
         sendBroadcast(task)
     }
 
     @JvmStatic
-    private fun sendBroadcast(task: Task?) {
-        if (task == null) return
+     fun sendBroadcast(task: Task) {
         var intent: Intent? = null
         if (task.customBroadcast.orEmpty().isNotBlank()) {
             intent = Intent(task.customBroadcast)
@@ -60,15 +57,14 @@ object DownloadEndNotify {
 
 
     @JvmStatic
-    fun failNotify(task: Task?, msg: String?) {
-        if (task == null) return
+    fun failNotify(task: Task, msg: String?) {
         if (task.contentLength > 0L && ERROR_TAG_3 != msg ) {
             DdNet.instance.callbackMgr.loop(task)
-            TaskCallbackMgr.instance.loop(task)
+            HoldActivityCallbackMap.loop(task)
         }
         if (ERROR_TAG_11 != msg) { // 重试下载，不抛给业务
-            DdNet.instance.callbackMgr.loopFail(msg ?: "", task as? Task?)
-            TaskCallbackMgr.instance.loopFail(msg ?: "", task as? Task?)
+            DdNet.instance.callbackMgr.loopFail(msg ?: "", task )
+            HoldActivityCallbackMap.loopFail(msg ?: "", task )
         }
     }
 

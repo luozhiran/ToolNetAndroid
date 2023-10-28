@@ -3,14 +3,9 @@ package com.itg.net.reqeust.model.base
 import android.app.Activity
 import android.os.Handler
 import android.os.Message
-import androidx.activity.ComponentActivity
 import com.itg.net.DdNet
 import com.itg.net.base.DdCallback
-import com.itg.net.download.Task
-import com.itg.net.download.TaskCallbackMgr
 import com.itg.net.download.operations.PrincipalLife
-import com.itg.net.reqeust.MyLifecycleEventObserver
-import com.itg.net.reqeust.model.post.content.PostContent
 import okhttp3.*
 import java.io.IOException
 

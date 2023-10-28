@@ -2,10 +2,9 @@ package com.itg.net
 
 import com.itg.net.download.Task
 import com.itg.net.download.DispatchTool
-import com.itg.net.download.TaskCallbackMgr
 import com.itg.net.download.data.TaskBuilder
 import com.itg.net.download.interfaces.IProgressCallback
-import com.itg.net.download.interfaces.ITask
+import com.itg.net.download.operations.HoldActivityCallbackMap
 
 class Download {
 
@@ -37,9 +36,12 @@ class Download {
      * 或者调用DdNet.instance.download.cancel(task),取消任务同时会释放下载器
      * @param task Task?
      */
-    fun removeInnerProgressListener(task: Task?){
-        if (task == null) return
-        TaskCallbackMgr.instance.removeProgressCallback(task)
+    fun removeAllProgressListener(task: Task){
+        HoldActivityCallbackMap.removeProgressCallback(task)
+    }
+
+    fun removeAllProgressListener(task: Task,iProgressCallback:IProgressCallback){
+        HoldActivityCallbackMap.removeProgressCallback(task,iProgressCallback)
     }
 
     fun isQueue(url: String): Boolean {

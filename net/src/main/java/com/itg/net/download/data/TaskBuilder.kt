@@ -1,13 +1,17 @@
 package com.itg.net.download.data
 
-import android.app.Activity
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import com.google.android.material.transition.platform.Hold
 import com.itg.net.DdNet
 import com.itg.net.download.*
-import com.itg.net.download.TaskCallbackMgr
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.operations.DownloadEndNotify
+import com.itg.net.download.operations.HoldActivityCallbackMap
 import com.itg.net.download.operations.PrincipalLife
+import com.itg.net.download.request.TaskState
 
 class TaskBuilder {
     private val task by lazy { Task() }
@@ -17,9 +21,10 @@ class TaskBuilder {
                 DownloadEndNotify.connectNotify(task)
             }
 
-            override fun onProgress(task: Task, complete:Boolean) {
+            override fun onProgress(task: Task, complete: Boolean) {
                 if (complete) {
                     DownloadEndNotify.completeNotify(task)
+                    HoldActivityCallbackMap.removeProgressCallback(task)
                 } else {
                     DownloadEndNotify.progressNotify(task)
                 }
@@ -27,6 +32,7 @@ class TaskBuilder {
 
             override fun onFail(error: String?, task: Task) {
                 DownloadEndNotify.failNotify(task, error)
+                HoldActivityCallbackMap.removeProgressCallback(task)
             }
 
         }
@@ -50,19 +56,21 @@ class TaskBuilder {
         return this
     }
 
-    //自动移除持有activity引用的回调
-    fun autoRemote(activity: FragmentActivity): TaskBuilder {
-        PrincipalLife.observeActivityLife(task, activity)
+    //自动移除持有activity引用的回调,无法取消下载任务(需要调用取消方法，取消下载任务)
+    fun autoRemoveActivity(activity: FragmentActivity): TaskBuilder {
+        activity.lifecycle.addObserver(object : LifecycleEventObserver{
+            override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
+                if (event == Lifecycle.Event.ON_DESTROY) {
+                    holdActivityRef?.apply { HoldActivityCallbackMap.removeProgressCallback(task,this) }
+                    activity.lifecycle.removeObserver(this)
+                }
+            }
+        })
         return this
     }
 
     fun setDownloadListener(progressBack: IProgressCallback): TaskBuilder {
         holdActivityRef = progressBack
-        TaskCallbackMgr.instance.setProgressCallback(task, progressBack)
-        return this
-    }
-
-    fun stealth(): TaskBuilder {
         return this
     }
 
@@ -72,19 +80,15 @@ class TaskBuilder {
         // 校验任务是否为无效任务
         if (taskState.isInvalidTask(task)) {
             holdActivityRef?.onFail(ERROR_TAG_7, task)
-            PrincipalLife.removeProgressCallback(task)
             return task
         }
+        holdActivityRef?.apply { HoldActivityCallbackMap.setProgressCallback(task, this) }
         // 校验请求地址是否正在下载
         if (taskState.exitRunningUrl(task.url)) {
-            holdActivityRef?.onFail(ERROR_TAG_8, task)
-            PrincipalLife.removeProgressCallback(task)
             return task
         }
         // 校验请求地址是否已经在任务队列
         if (taskState.exitWaitUrl(task.url)) {
-            holdActivityRef?.onFail(ERROR_TAG_10, task)
-            PrincipalLife.removeProgressCallback(task)
             return task
         }
         // 下载任务是否启动断点续传
