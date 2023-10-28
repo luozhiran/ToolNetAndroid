@@ -4,16 +4,15 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.itg.net.DdNet
+import com.itg.net.Net
+import com.itg.net.Download
 import com.itg.net.MEDIA_JSON
-import com.itg.net.base.DdCallback
-import com.itg.net.download.Task
+import com.itg.net.reqeust.base.DdCallback
+import com.itg.net.download.data.Task
 import com.itg.net.download.interfaces.IProgressCallback
-import com.itg.net.download.interfaces.ITask
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    var task: ITask? = null
     var stop = true
     private val progress = object : IProgressCallback {
         override fun onConnecting(task: Task) {
@@ -31,7 +30,7 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        DdNet.instance.download.setGlobalProgressListener(progress)
+       Download.instance.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
             val i = 1
 //            for (i in 0..10) {
@@ -39,7 +38,7 @@ class MainActivity : AppCompatActivity() {
                 Log.e("MainActivity", "延时$i")
                 val path = "${filesDir}/$i.zip";
 
-                DdNet.instance.download
+                  Download.instance
                     .taskBuilder()
                     .path(path)
                     .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690${i}.zip")
@@ -71,7 +70,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.get).setOnClickListener {
-            DdNet.instance.get()
+            Net.instance.get()
                 .url("http://www.baidu.com")
                 .addParam("key1", "a")
                 .addParam("key2", "b")
@@ -90,7 +89,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
-            DdNet.instance.postContent()
+            Net.instance.postContent()
                 .url("https://www.baidu.com")
                 .addContent("fadsf", MEDIA_JSON)
                 .autoCancel(this)
@@ -112,6 +111,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        DdNet.instance.download.remoteGlobalProgressListener(progress)
+        Download.instance.remoteGlobalProgressListener(progress)
     }
 }

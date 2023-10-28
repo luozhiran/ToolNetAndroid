@@ -1,7 +1,8 @@
 package com.itg.net.download.request
 
-import com.itg.net.download.*
+import com.itg.net.download.data.Task
 import com.itg.net.download.implement.OnDownloadListenerImpl
+import com.itg.net.download.operations.TaskState
 
 /**
  * 直接下载任务

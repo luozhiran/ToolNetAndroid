@@ -3,9 +3,13 @@ package com.itg.net.download
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
-import com.itg.net.download.request.TaskState
+import com.itg.net.download.data.DOWNLOAD_FILE
+import com.itg.net.download.data.DOWNLOAD_SUCCESS
+import com.itg.net.download.data.DOWNLOAD_TASK
+import com.itg.net.download.data.ERROR_TAG_11
+import com.itg.net.download.data.Task
+import com.itg.net.download.operations.TaskState
 import com.itg.net.download.interfaces.Dispatch
-import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.request.BreakpointContinuationRequest
 import com.itg.net.download.request.DirectRequest
 import com.itg.net.tools.TaskTools

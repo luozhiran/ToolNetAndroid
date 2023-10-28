@@ -1,14 +1,20 @@
 package com.itg.net
 
-import com.itg.net.download.Task
+import com.itg.net.download.GlobalDownloadProgressCache
+import com.itg.net.download.data.Task
 import com.itg.net.download.DispatchTool
 import com.itg.net.download.data.TaskBuilder
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.operations.HoldActivityCallbackMap
 
 class Download {
+    companion object {
+        @JvmStatic
+        val instance: Download by lazy { Download() }
+    }
 
     val dispatchTool: DispatchTool by lazy { DispatchTool() }
+    internal val globalDownloadProgressCache: GlobalDownloadProgressCache by lazy { GlobalDownloadProgressCache() }
 
     fun taskBuilder(): TaskBuilder {
         return TaskBuilder()
@@ -19,7 +25,7 @@ class Download {
      * @param progressBack IProgressCallback
      */
     fun setGlobalProgressListener(progressBack: IProgressCallback) {
-        DdNet.instance.callbackMgr.addProgressCallback(progressBack)
+        globalDownloadProgressCache.addItem(progressBack)
     }
 
     /**
@@ -27,7 +33,7 @@ class Download {
      * @param progressBack IProgressCallback
      */
     fun remoteGlobalProgressListener(progressBack: IProgressCallback) {
-        DdNet.instance.callbackMgr.removeProgressBack(progressBack)
+        globalDownloadProgressCache.removeItem(progressBack)
     }
 
 
@@ -40,7 +46,7 @@ class Download {
         HoldActivityCallbackMap.removeProgressCallback(task)
     }
 
-    fun removeAllProgressListener(task: Task,iProgressCallback:IProgressCallback){
+    fun removeAllProgressListener(task: Task, iProgressCallback:IProgressCallback){
         HoldActivityCallbackMap.removeProgressCallback(task,iProgressCallback)
     }
 
@@ -53,7 +59,7 @@ class Download {
         val taskState = dispatchTool.getTaskState()
         if (taskState.exitRunningUrl(url)) {
             taskState.deleteRunningTask(url)
-            DdNet.instance.cancelFirstTag(url)
+            Net.instance.cancelFirstTag(url)
         }else if (taskState.exitWaitUrl(url)) {
             taskState.deleteWaitTask(url)
         }
@@ -63,7 +69,7 @@ class Download {
         val taskState = dispatchTool.getTaskState()
         if (taskState.exitRunningTask(task)) {
             taskState.deleteRunningTask(task)
-            DdNet.instance.cancelFirstTag(task?.url)
+            Net.instance.cancelFirstTag(task?.url)
         } else if (taskState.exitWaitTask(task)) {
             taskState.deleteWaitTask(task)
         }

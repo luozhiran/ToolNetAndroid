@@ -1,10 +1,16 @@
 package com.itg.net.download.request
 
-import com.itg.net.DdNet
+import com.itg.net.Net
 import com.itg.net.ModeType
-import com.itg.net.download.*
-import com.itg.net.download.interfaces.ITask
-import com.itg.net.reqeust.model.params.ParamsBuilder
+import com.itg.net.download.data.ERROR_TAG_12
+import com.itg.net.download.data.ERROR_TAG_2
+import com.itg.net.download.data.ERROR_TAG_3
+import com.itg.net.download.data.ERROR_TAG_4
+import com.itg.net.download.data.ERROR_TAG_5
+import com.itg.net.download.data.ERROR_TAG_6
+import com.itg.net.download.data.Task
+import com.itg.net.download.operations.TaskState
+import com.itg.net.reqeust.base.ParamsBuilder
 import com.itg.net.tools.CheckTools
 import com.itg.net.tools.TaskTools
 import okhttp3.Response
@@ -17,7 +23,7 @@ abstract class BaseRequest(private val task: Task, private val taskStateInstance
 
 
     protected fun getBuilder(): ParamsBuilder {
-        val builder = DdNet.instance.builder(ModeType.Get).url(task.url)
+        val builder = Net.instance.builder(ModeType.Get).url(task.url)
         return builder
     }
 
