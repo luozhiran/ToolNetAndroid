@@ -64,6 +64,8 @@ object DownloadEndNotify {
         }
         Download.instance.globalDownloadProgressCache.execAllOnFail(msg ?: "", task )
         HoldActivityCallbackMap.loopFail(msg ?: "", task )
+        Download.instance.dispatchTool.getTaskState().debugPrint()
+        HoldActivityCallbackMap.debugPrint()
     }
 
 }

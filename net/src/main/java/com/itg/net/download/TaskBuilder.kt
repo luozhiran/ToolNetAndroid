@@ -1,4 +1,4 @@
-package com.itg.net.download.data
+package com.itg.net.download
 
 import android.util.Log
 import androidx.fragment.app.FragmentActivity
@@ -6,6 +6,9 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
 import com.itg.net.Download
+import com.itg.net.download.data.DEBUG_TAG
+import com.itg.net.download.data.ERROR_TAG_7
+import com.itg.net.download.data.Task
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.operations.DownloadEndNotify
 import com.itg.net.download.operations.HoldActivityCallbackMap

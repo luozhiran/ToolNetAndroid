@@ -7,7 +7,9 @@ import com.itg.net.download.data.DOWNLOAD_FILE
 import com.itg.net.download.data.DOWNLOAD_SUCCESS
 import com.itg.net.download.data.DOWNLOAD_TASK
 import com.itg.net.download.data.ERROR_TAG_11
+import com.itg.net.download.data.LockData
 import com.itg.net.download.data.Task
+import com.itg.net.download.implement.ReceiverHandler
 import com.itg.net.download.operations.TaskState
 import com.itg.net.download.interfaces.Dispatch
 import com.itg.net.download.request.BreakpointContinuationRequest
@@ -25,6 +27,8 @@ class DispatchTool : Dispatch {
     @Volatile
     private var handler: ReceiverHandler? = null
 
+    private val lock by lazy { LockData() }
+
     init {
         val thread = HandlerThread("ddl")
         thread.start()
@@ -35,18 +39,19 @@ class DispatchTool : Dispatch {
     /**
      * 从任务队列中获取下载任务
      */
-    @Synchronized
     private fun downloadNextTask() {
-        if (taskStateInstance.runningQueueCanAcceptTask()) {
-            taskStateInstance.getTaskFromWaitQueue(null)?.apply {
-                if (taskStateInstance.addRunningTask(this)) {
-                    if (taskStateInstance.isBreakpointContinuation(this)) {
-                        appendDownload(this as Task)
+        synchronized(lock) {
+            if (taskStateInstance.runningQueueCanAcceptTask()) {
+                taskStateInstance.getTaskFromWaitQueue(null)?.apply {
+                    if (taskStateInstance.addRunningTask(this)) {
+                        if (taskStateInstance.isBreakpointContinuation(this)) {
+                            immediatelyBreakpointContinuationRequest(this)
+                        } else {
+                            immediatelyDownload(this)
+                        }
                     } else {
-                        download(this as Task)
+                        downloadNextTask()
                     }
-                } else {
-                    downloadNextTask()
                 }
             }
         }
@@ -56,7 +61,6 @@ class DispatchTool : Dispatch {
      * 任务有重试次数，在一次上次失败的任务
      */
     private fun tryAgainDownloadTask(preTask: Task) {
-        synchronized(this) {
             if (taskStateInstance.exitRunningTask(preTask)) {
                 if (taskStateInstance.isBreakpointContinuation(preTask)) {
                     logisticsBreakpointContinuation(preTask)
@@ -66,17 +70,18 @@ class DispatchTool : Dispatch {
             } else {
                 downloadNextTask()
             }
-        }
     }
 
     override fun download(task: Task) {
-        synchronized(this) {
-            if (taskStateInstance.runningQueueCanAcceptTask()) {
-                immediatelyDownload(task)
-            } else {
-                pendingDownload(task)
+        if (taskStateInstance.runningQueueCanAcceptTask()) {
+            synchronized(lock) {
+                if (taskStateInstance.runningQueueCanAcceptTask()) {
+                    immediatelyDownload(task)
+                    return
+                }
             }
         }
+        pendingDownload(task)
     }
 
 
@@ -85,12 +90,14 @@ class DispatchTool : Dispatch {
      * @param task DTask
      */
     private fun immediatelyDownload(task: Task) {
-        // 从等待队列中取得下载任务
-        val downloadTask = taskStateInstance.getTaskFromWaitQueue(task) as Task
-        // 把任务存储到下载队列
-        taskStateInstance.addRunningTask(downloadTask)
-        // 开始下载
-        logisticsDownload(downloadTask)
+        synchronized(this) {
+            // 从等待队列中取得下载任务
+            val downloadTask = taskStateInstance.getTaskFromWaitQueue(task) as Task
+            // 把任务存储到下载队列
+            taskStateInstance.addRunningTask(downloadTask)
+            // 开始下载
+            logisticsDownload(downloadTask)
+        }
     }
 
     /**
@@ -121,13 +128,15 @@ class DispatchTool : Dispatch {
      * @param task DTask
      */
     override fun appendDownload(task: Task) {
-        synchronized(this) {
-            if (taskStateInstance.runningQueueCanAcceptTask()) {
-                immediatelyBreakpointContinuationRequest(task)
-            } else {
-                pendingDownload(task)
+        if (taskStateInstance.runningQueueCanAcceptTask()) {
+            synchronized(lock) {
+                if (taskStateInstance.runningQueueCanAcceptTask()) {
+                    immediatelyBreakpointContinuationRequest(task)
+                    return
+                }
             }
         }
+        pendingDownload(task)
     }
 
     /**
@@ -180,13 +189,10 @@ class DispatchTool : Dispatch {
     }
 
     private fun execNextDownloadRequest(message: Message): Boolean {
-        synchronized(this) {
-            if (message.what == DOWNLOAD_FILE && isAgainDownload(message.obj)) {
-                tryAgainDownloadTask(message.obj as Task)
-            } else { // DOWNLOAD_TASK CANCEL_TASK DOWNLOAD_FILE  DOWNLOAD_SUCCESS
-                downloadNextTask()
-            }
-
+        if (message.what == DOWNLOAD_FILE && isAgainDownload(message.obj)) {
+            tryAgainDownloadTask(message.obj as Task)
+        } else { // DOWNLOAD_TASK CANCEL_TASK DOWNLOAD_FILE  DOWNLOAD_SUCCESS
+            downloadNextTask()
         }
         return true
     }

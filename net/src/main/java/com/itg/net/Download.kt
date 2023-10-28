@@ -1,9 +1,9 @@
 package com.itg.net
 
-import com.itg.net.download.GlobalDownloadProgressCache
+import com.itg.net.download.operations.GlobalDownloadProgressCache
 import com.itg.net.download.data.Task
 import com.itg.net.download.DispatchTool
-import com.itg.net.download.data.TaskBuilder
+import com.itg.net.download.TaskBuilder
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.operations.HoldActivityCallbackMap
 
@@ -46,7 +46,10 @@ class Download {
         HoldActivityCallbackMap.removeProgressCallback(task)
     }
 
-    fun removeAllProgressListener(task: Task, iProgressCallback:IProgressCallback){
+    /**
+     * 移动指定Task对于监听器列表中指定的监听器
+     */
+    fun removeProgressListener(task: Task, iProgressCallback:IProgressCallback){
         HoldActivityCallbackMap.removeProgressCallback(task,iProgressCallback)
     }
 

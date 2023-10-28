@@ -32,12 +32,10 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
        Download.instance.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
-            val i = 1
-//            for (i in 0..10) {
+            for (i in 0..10) {
 //                Thread.sleep(1000)
                 Log.e("MainActivity", "延时$i")
-                val path = "${filesDir}/$i.zip";
-
+                val path = "${filesDir}/$i.zip"
                   Download.instance
                     .taskBuilder()
                     .path(path)
@@ -64,7 +62,7 @@ class MainActivity : AppCompatActivity() {
 
                     })
                     .start()
-//            }
+            }
 
 
         }

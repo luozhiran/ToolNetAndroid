@@ -65,7 +65,24 @@ object HoldActivityCallbackMap {
         }
     }
 
+    /**
+     * 获取url对于监听器数量
+     */
+    fun getUrlProgressCallbackNum(url:String):Int{
+        if (url.isBlank()) return 0
+        val callbackList = progressCallbackMap[url]
+        return callbackList?.size ?:0
+    }
+
+    /**
+     * 获取task对于监听器数量
+     */
+    fun getUrlProgressCallbackNum(task: Task):Int{
+        if (task.url.isNullOrBlank()) return 0
+        return getUrlProgressCallbackNum(task.url!!)
+    }
+
     fun debugPrint(){
-        Log.i(DEBUG_TAG,"全局监听器数量：${progressCallbackMap.size}")
+        Log.i(DEBUG_TAG,"监听器数量：${progressCallbackMap.size}")
     }
 }

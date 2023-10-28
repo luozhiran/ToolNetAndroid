@@ -1,4 +1,4 @@
-package com.itg.net.download
+package com.itg.net.download.operations
 
 import com.itg.net.download.data.LockData
 import com.itg.net.download.data.Task
