@@ -190,7 +190,7 @@ class DispatchTool : Dispatch {
     private fun isAgainDownload(obj:Any?):Boolean{
         if (obj == null) return false
         val task = obj as Task
-        return task.tryAgainCount <= 0
+        return task.tryAgainCount > 0
     }
 
     fun getTaskState(): TaskState {

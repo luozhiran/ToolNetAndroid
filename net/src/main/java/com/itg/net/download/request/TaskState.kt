@@ -3,6 +3,7 @@ package com.itg.net.download.request
 import android.util.Log
 import com.itg.net.DdNet
 import com.itg.net.download.DEBUG_TAG
+import com.itg.net.download.ERROR_TAG_11
 import com.itg.net.download.Task
 import com.itg.net.download.data.LockData
 import com.itg.net.download.interfaces.ITask
@@ -119,6 +120,7 @@ class TaskState {
                 mRunningTasksUrl.remove(task.url)
             }
         }
+        //下载成功后，删除存储在单例集合中的持有Activity引用的回调对象
         HoldActivityCallbackMap.removeProgressCallback(task)
     }
 
@@ -230,6 +232,14 @@ class TaskState {
 
     fun canNextTask(): Boolean {
         if (runningQueueCanAcceptTask() && mWaitTask.size > 0) return true
+        return false
+    }
+
+    fun isTryAgainDownload(tag:String?):Boolean{
+        if (tag.isNullOrBlank()) return false
+        if (tag == ERROR_TAG_11) {
+            return true
+        }
         return false
     }
 

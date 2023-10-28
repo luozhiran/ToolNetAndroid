@@ -62,10 +62,8 @@ object DownloadEndNotify {
             DdNet.instance.callbackMgr.loop(task)
             HoldActivityCallbackMap.loop(task)
         }
-        if (ERROR_TAG_11 != msg) { // 重试下载，不抛给业务
-            DdNet.instance.callbackMgr.loopFail(msg ?: "", task )
-            HoldActivityCallbackMap.loopFail(msg ?: "", task )
-        }
+        DdNet.instance.callbackMgr.loopFail(msg ?: "", task )
+        HoldActivityCallbackMap.loopFail(msg ?: "", task )
     }
 
 }

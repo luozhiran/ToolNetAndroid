@@ -1,5 +1,6 @@
 package com.itg.net.download.data
 
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -24,15 +25,20 @@ class TaskBuilder {
             override fun onProgress(task: Task, complete: Boolean) {
                 if (complete) {
                     DownloadEndNotify.completeNotify(task)
-                    HoldActivityCallbackMap.removeProgressCallback(task)
+
                 } else {
                     DownloadEndNotify.progressNotify(task)
                 }
             }
 
             override fun onFail(error: String?, task: Task) {
+                if (DdNet.instance.download.dispatchTool.getTaskState()
+                        .isTryAgainDownload(error)
+                ) {
+                    Log.e(DEBUG_TAG,"重新开始下载")
+                    return
+                }
                 DownloadEndNotify.failNotify(task, error)
-                HoldActivityCallbackMap.removeProgressCallback(task)
             }
 
         }
@@ -58,10 +64,15 @@ class TaskBuilder {
 
     //自动移除持有activity引用的回调,无法取消下载任务(需要调用取消方法，取消下载任务)
     fun autoRemoveActivity(activity: FragmentActivity): TaskBuilder {
-        activity.lifecycle.addObserver(object : LifecycleEventObserver{
+        activity.lifecycle.addObserver(object : LifecycleEventObserver {
             override fun onStateChanged(source: LifecycleOwner, event: Lifecycle.Event) {
                 if (event == Lifecycle.Event.ON_DESTROY) {
-                    holdActivityRef?.apply { HoldActivityCallbackMap.removeProgressCallback(task,this) }
+                    holdActivityRef?.apply {
+                        HoldActivityCallbackMap.removeProgressCallback(
+                            task,
+                            this
+                        )
+                    }
                     activity.lifecycle.removeObserver(this)
                 }
             }
