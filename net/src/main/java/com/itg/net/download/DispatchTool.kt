@@ -8,6 +8,7 @@ import com.itg.net.download.data.DOWNLOAD_SUCCESS
 import com.itg.net.download.data.DOWNLOAD_TASK
 import com.itg.net.download.data.ERROR_TAG_11
 import com.itg.net.download.data.Task
+import com.itg.net.download.implement.ReceiverHandler
 import com.itg.net.download.operations.TaskState
 import com.itg.net.download.interfaces.Dispatch
 import com.itg.net.download.request.BreakpointContinuationRequest

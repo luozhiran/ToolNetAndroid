@@ -1,4 +1,4 @@
-package com.itg.net.download
+package com.itg.net.download.implement
 
 import android.os.Handler
 import android.os.Looper

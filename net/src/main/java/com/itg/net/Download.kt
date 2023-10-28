@@ -3,7 +3,7 @@ package com.itg.net
 import com.itg.net.download.GlobalDownloadProgressCache
 import com.itg.net.download.data.Task
 import com.itg.net.download.DispatchTool
-import com.itg.net.download.data.TaskBuilder
+import com.itg.net.download.TaskBuilder
 import com.itg.net.download.interfaces.IProgressCallback
 import com.itg.net.download.operations.HoldActivityCallbackMap
 
