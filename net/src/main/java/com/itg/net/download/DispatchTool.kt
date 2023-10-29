@@ -3,11 +3,13 @@ package com.itg.net.download
 import android.os.HandlerThread
 import android.os.Looper
 import android.os.Message
+import android.util.Log
 import com.itg.net.download.data.DOWNLOAD_FILE
 import com.itg.net.download.data.DOWNLOAD_SUCCESS
 import com.itg.net.download.data.DOWNLOAD_TASK
 import com.itg.net.download.data.ERROR_TAG_11
 import com.itg.net.download.data.LockData
+import com.itg.net.download.data.DOWNLOAD_LOG
 import com.itg.net.download.data.Task
 import com.itg.net.download.implement.ReceiverHandler
 import com.itg.net.download.operations.TaskState
@@ -43,14 +45,10 @@ class DispatchTool : Dispatch {
         synchronized(lock) {
             if (taskStateInstance.runningQueueCanAcceptTask()) {
                 taskStateInstance.getTaskFromWaitQueue(null)?.apply {
-                    if (taskStateInstance.addRunningTask(this)) {
-                        if (taskStateInstance.isBreakpointContinuation(this)) {
-                            immediatelyBreakpointContinuationRequest(this)
-                        } else {
-                            immediatelyDownload(this)
-                        }
+                    if (taskStateInstance.isBreakpointContinuation(this)) {
+                        immediatelyBreakpointContinuationRequest(this)
                     } else {
-                        downloadNextTask()
+                        immediatelyDownload(this)
                     }
                 }
             }
@@ -90,9 +88,9 @@ class DispatchTool : Dispatch {
      * @param task DTask
      */
     private fun immediatelyDownload(task: Task) {
-        synchronized(this) {
+        synchronized(lock) {
             // 从等待队列中取得下载任务
-            val downloadTask = taskStateInstance.getTaskFromWaitQueue(task) as Task
+            val downloadTask = taskStateInstance.getTaskFromWaitQueue(task) ?: return
             // 把任务存储到下载队列
             taskStateInstance.addRunningTask(downloadTask)
             // 开始下载
@@ -144,11 +142,13 @@ class DispatchTool : Dispatch {
      * @param task DTask
      */
     private fun immediatelyBreakpointContinuationRequest(task: Task) {
-        // 从等待队列中取得下载任务
-        val downloadTask = taskStateInstance.getTaskFromWaitQueue(task) as Task
-        // 把任务存储到下载队列
-        taskStateInstance.addRunningTask(downloadTask)
-        logisticsBreakpointContinuation(task)
+        synchronized(lock) {
+            // 从等待队列中取得下载任务
+            val downloadTask = taskStateInstance.getTaskFromWaitQueue(task) ?: return
+            // 把任务存储到下载队列
+            taskStateInstance.addRunningTask(downloadTask)
+            logisticsBreakpointContinuation(task)
+        }
     }
 
     /**

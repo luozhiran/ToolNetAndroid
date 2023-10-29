@@ -4,6 +4,7 @@ import android.util.Log
 import com.itg.net.Net
 import com.itg.net.download.data.DEBUG_TAG
 import com.itg.net.download.data.ERROR_TAG_11
+import com.itg.net.download.data.DOWNLOAD_LOG
 import com.itg.net.download.data.Task
 
 class TaskState {
@@ -192,7 +193,9 @@ class TaskState {
     fun getTaskFromWaitQueue(task: Task?): Task? {
         return if (task == null) {
             findFirstTaskFromWaitQueue()
-        } else {
+        } else if (runningQueueCanAcceptTask()) {
+            task
+        }else {
             addWaitTask(task)
             findFirstTaskFromWaitQueue()
         }
