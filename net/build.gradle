@@ -134,9 +134,9 @@ afterEvaluate {
 //增加自定义代码
 def getRepositoryUrl() {
     if (isReleaseBuild()){
-        return "https://nexus.ddxq.mobi/repository/maven-releases/"
+        return ""
     } else {
-        return "https://nexus.ddxq.mobi/repository/maven-snapshots/"
+        return ""
     }
 }
 
