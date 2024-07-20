@@ -2,6 +2,7 @@ package com.itg.net.reqeust.post.multipart
 
 import android.app.Activity
 import com.itg.net.reqeust.get.GetBuilder
+import com.itg.net.reqeust.post.form.PostFormBuilder
 import com.itg.net.reqeust.post.json.PostJsonGenerator
 import okhttp3.Cookie
 import java.io.File
@@ -89,6 +90,10 @@ abstract class PostMulGenerator : PostMulBuilderImpl() {
 
     override fun path(path: String): PostMulGenerator {
         super.path(path)
+        return this
+    }
+    override fun noUseGlobalParams(): PostMulGenerator {
+        super.noUseGlobalParams()
         return this
     }
 }

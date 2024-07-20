@@ -52,9 +52,11 @@ abstract class PostFormBuilder : ParamsBuilder(), GetBuilder {
     internal fun getUrl(): String {
         val urlParamsMap = UrlTools.cutOffStrToMap(urlParams.toString())
         val totalParamsMap = mutableMapOf<String,Any?>()
-        totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
-        urlParamsMap?.let {
-            totalParamsMap.putAll(it)
+        if (!this.noGlobalParams) {
+            totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
+            urlParamsMap?.let {
+                totalParamsMap.putAll(it)
+            }
         }
         return UrlTools.getSpliceUrl(totalParamsMap,this.url?:"")
     }
@@ -95,6 +97,11 @@ abstract class PostFormBuilder : ParamsBuilder(), GetBuilder {
     }
 
     override fun autoCancel(activity: Activity?): PostFormBuilder {
+        return this
+    }
+
+    override fun noUseGlobalParams(): PostFormBuilder {
+        super.noUseGlobalParams()
         return this
     }
 }

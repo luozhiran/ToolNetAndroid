@@ -2,6 +2,7 @@ package com.itg.net.reqeust.post.content
 
 import android.app.Activity
 import com.itg.net.reqeust.post.form.PostFormBuilder
+import com.itg.net.reqeust.post.json.PostJsonBuilder
 import okhttp3.Cookie
 
 abstract class PostContentGenerator : PostContentBuilder() {
@@ -52,6 +53,11 @@ abstract class PostContentGenerator : PostContentBuilder() {
 
     override fun path(path: String): PostContentGenerator {
         super.path(path)
+        return this
+    }
+
+    override fun noUseGlobalParams(): PostContentGenerator {
+        super.noUseGlobalParams()
         return this
     }
 

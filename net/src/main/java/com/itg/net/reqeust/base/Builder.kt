@@ -15,4 +15,5 @@ interface Builder {
     fun addTag(tag: String?): Builder
     fun autoCancel(activity: Activity?): Builder
     fun path(path:String):Builder
+    fun noUseGlobalParams():Builder
 }

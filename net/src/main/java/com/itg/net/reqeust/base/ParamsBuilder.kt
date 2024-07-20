@@ -3,6 +3,7 @@ package com.itg.net.reqeust.base
 import android.app.Activity
 import android.text.TextUtils
 import com.itg.net.Net
+import com.itg.net.reqeust.post.json.PostJsonBuilder
 import com.itg.net.tools.StrTools
 import com.itg.net.tools.UrlTools
 import okhttp3.Cookie
@@ -35,6 +36,7 @@ abstract class ParamsBuilder : Builder, SentBuilder {
     var cookies: String? = null
     var tag: String? = null
     var path:String?=null
+    var noGlobalParams = false
 
     override fun addHeader(key: String?, value: String?): ParamsBuilder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
@@ -69,6 +71,11 @@ abstract class ParamsBuilder : Builder, SentBuilder {
 
     override fun path(path: String): Builder {
         this.path = path
+        return this
+    }
+
+    override fun noUseGlobalParams(): Builder {
+        this.noGlobalParams = true
         return this
     }
 

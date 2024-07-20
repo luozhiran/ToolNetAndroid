@@ -62,4 +62,9 @@ abstract class PostFileGenerator : PostFileBuilder() {
         return this
     }
 
+    override fun noUseGlobalParams(): ParamsBuilder {
+        super.noUseGlobalParams()
+        return this
+    }
+
 }

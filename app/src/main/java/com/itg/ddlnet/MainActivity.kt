@@ -98,8 +98,8 @@ class MainActivity : AppCompatActivity() {
                 .path("login")
                 .addParam("loginname","18516607913")
                 .addParam("nonce",num)
-                .addParam("pwd",md5("123456${num}"))
-                .noUseUrlCommonParams()
+                .addParam("pwd",md5("${md5("123456")}${num}"))
+                .noUseGlobalParams()
                 .autoCancel(this)
                 .send(object : DdCallback {
                     override fun onFailure(er: String?) {

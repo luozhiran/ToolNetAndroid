@@ -4,6 +4,7 @@ import android.app.Activity
 import android.icu.number.IntegerWidth
 import android.text.TextUtils
 import com.itg.net.Net
+import com.itg.net.reqeust.base.Builder
 import com.itg.net.reqeust.base.ParamsBuilder
 import com.itg.net.reqeust.get.GetBuilder
 import com.itg.net.reqeust.post.form.PostFormBuilder
@@ -21,7 +22,6 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
     private val urlParams = StringBuilder()
     private val params = StringBuilder()
     private var jsonObject = JSONObject()
-    private var noUseCommonParams = true
 
     internal fun addJson1(json: String?): PostJsonBuilder {
         val formParams = UrlTools.cutOffStrToMap(params.toString())
@@ -83,11 +83,7 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
         return this
     }
 
-    fun noUseUrlCommonParams():PostJsonBuilder {
-        this.noUseCommonParams = false
-        return this;
 
-    }
 
     override fun addParam(map: MutableMap<String, String?>?): PostJsonBuilder {
         if (map.isNullOrEmpty()) return this
@@ -104,7 +100,7 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
     internal fun getUrl(): String {
         val urlParamsMap = UrlTools.cutOffStrToMap(urlParams.toString())
         val totalParamsMap = mutableMapOf<String, Any?>()
-        if (this.noUseCommonParams) {
+        if (!this.noGlobalParams) {
             totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
             urlParamsMap?.let {
                 totalParamsMap.putAll(it)
@@ -130,6 +126,11 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
 
     override fun addCookie(cookie: Cookie?): PostJsonBuilder {
         super.addCookie(cookie)
+        return this
+    }
+
+    override fun noUseGlobalParams(): PostJsonBuilder {
+        super.noUseGlobalParams()
         return this
     }
 
