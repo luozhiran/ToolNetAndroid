@@ -2,25 +2,8 @@
 buildscript {
     ext.kotlin_version = '1.5.32'
     repositories {
-        mavenLocal()
-        maven {
-            url 'https://nexus.ddxq.mobi/repository/maven-public/'
-            mavenContent {
-                releasesOnly()
-            }
-        }
-        maven {
-            url 'https://nexus.ddxq.mobi/repository/android-repos/'
-            mavenContent {
-                releasesOnly()
-            }
-        }
-        maven {
-            url 'https://nexus.ddxq.mobi/repository/maven-snapshots/'
-            mavenContent {
-                snapshotsOnly()
-            }
-        }
+        google()
+        mavenCentral()
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:4.2.2'
@@ -34,25 +17,22 @@ buildscript {
 
 allprojects {
     repositories {
-        mavenLocal()
+        maven { url "https://jitpack.io" }
         maven {
-            url 'https://nexus.ddxq.mobi/repository/maven-public/'
-            mavenContent {
-                releasesOnly()
-            }
+            url 'https://maven.aliyun.com/repository/public'
         }
         maven {
-            url 'https://nexus.ddxq.mobi/repository/android-repos/'
-            mavenContent {
-                releasesOnly()
-            }
+            url 'https://maven.aliyun.com/repository/central'
         }
         maven {
-            url 'https://nexus.ddxq.mobi/repository/maven-snapshots/'
-            mavenContent {
-                snapshotsOnly()
-            }
+            url 'https://maven.aliyun.com/repository/google'
         }
+        maven {
+            url 'https://maven.aliyun.com/repository/gradle-plugin'
+        }
+        google()
+        mavenCentral()
+        jcenter() // Warning: this repository is going to shut down soon
     }
 }
 

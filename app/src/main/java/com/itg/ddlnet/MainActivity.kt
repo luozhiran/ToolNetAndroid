@@ -1,66 +1,65 @@
 package com.itg.ddlnet
 
+import android.annotation.SuppressLint
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.itg.net.DdNet
+import com.itg.net.Net
+import com.itg.net.Download
 import com.itg.net.MEDIA_JSON
-import com.itg.net.base.DdCallback
+import com.itg.net.reqeust.base.DdCallback
+import com.itg.net.download.data.Task
 import com.itg.net.download.interfaces.IProgressCallback
-import com.itg.net.download.interfaces.Task
-import com.itg.net.reqeust.model.get.GetGenerator
 import java.io.File
 
 class MainActivity : AppCompatActivity() {
-    var task:Task?=null
     var stop = true
-    private val progress = object : IProgressCallback{
-        override fun onConnecting(task: Task?) {
-//            Log.e("MainActivity","global onConnecting")
+    private val progress = object : IProgressCallback {
+        override fun onConnecting(task: Task) {
 
         }
 
-        override fun onProgress(task: Task?) {
-//            Log.e("MainActivity","global onProgress"+task?.getProgress())
-
+        override fun onProgress(task: Task, complete:Boolean) {
         }
 
-        override fun onFail(error: String?, task: Task?) {
-//            Log.e("MainActivity",error?:"")
-
+        override fun onFail(error: String?, task: Task) {
         }
 
     }
+
+    @SuppressLint("SuspiciousIndentation")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        DdNet.instance.download.setGlobalProgressListener(progress)
+       Download.instance.setGlobalProgressListener(progress)
         findViewById<Button>(R.id.download).setOnClickListener {
-            for (i in 0.. 10) {
-                Thread.sleep(1000)
-                Log.e("MainActivity","延时$i")
-                val path = "${filesDir}/$i.zip";
-                task = DdNet.instance.download
-                    .downloadTask()
+            for (i in 0..10) {
+//                Thread.sleep(1000)
+                Log.e("MainActivity", "延时$i")
+                val path = "${filesDir}/$i.zip"
+                  Download.instance
+                    .taskBuilder()
                     .path(path)
-                    .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690.zip")
-                    .autoCancel(this)
+                    .url("https://static-webkit.ddimg.mobi/libra/te/7f6a1b6a365a888b4ca5aabb41e21690${i}.zip")
                     .tryAgainCount(3)
-                    .prepareEnd()
-                    .setProgressListener(object : IProgressCallback{
-                        override fun onConnecting(task: Task?) {
-                            Log.e("MainActivity","onConnecting $i")
+                    .autoRemoveActivity(this)
+                    .setDownloadListener(object : IProgressCallback {
+                        override fun onConnecting(task: Task) {
+                            Log.e("MainActivity", "onConnecting $i")
                         }
 
-                        override fun onProgress(task: Task?) {
-                            if (task?.getProgress() == 100) {
-                                Log.e("MainActivity", "download is success $path $i ${File(task.path()?:"").exists()}")
+                        override fun onProgress(task: Task, complete:Boolean) {
+                            if (complete) {
+                                Log.e(
+                                    "MainActivity",
+                                    "download is success $path $i ${File(task.path ?: "").exists()}"
+                                )
                             }
                         }
 
-                        override fun onFail(error: String?, task: Task?) {
-                            Log.e("MainActivity","onFail $error")
+                        override fun onFail(error: String?, task: Task) {
+                            Log.e("MainActivity", "onFail $error")
                         }
 
                     })
@@ -71,10 +70,12 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.get).setOnClickListener {
-            DdNet.instance.get()
-                .url("https://www.baidu.com")
+            Net.instance.get()
+                .url("http://www.baidu.com")
+                .addParam("key1", "a")
+                .addParam("key2", "b")
                 .autoCancel(this)
-                .send(object :DdCallback{
+                .send(object : DdCallback {
                     override fun onFailure(er: String?) {
 
                     }
@@ -88,11 +89,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
-            DdNet.instance.postContent()
+            Net.instance.postContent()
                 .url("https://www.baidu.com")
                 .addContent("fadsf", MEDIA_JSON)
                 .autoCancel(this)
-                .send(object :DdCallback{
+                .send(object : DdCallback {
                     override fun onFailure(er: String?) {
 
                     }
@@ -110,6 +111,6 @@ class MainActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        DdNet.instance.download.remoteGlobalProgressListener(progress)
+        Download.instance.remoteGlobalProgressListener(progress)
     }
 }

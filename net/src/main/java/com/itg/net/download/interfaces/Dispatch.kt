@@ -1,8 +1,8 @@
 package com.itg.net.download.interfaces
 
-import com.itg.net.download.DTask
+import com.itg.net.download.data.Task
 
 interface Dispatch {
-    fun download(task: DTask)
-    fun appendDownload(task: DTask)
+    fun download(task: Task)
+    fun appendDownload(task: Task)
 }

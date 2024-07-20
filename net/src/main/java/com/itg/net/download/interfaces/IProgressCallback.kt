@@ -1,6 +1,6 @@
 package com.itg.net.download.interfaces
 
-import com.itg.net.download.interfaces.Task
+import com.itg.net.download.data.Task
 
 interface IProgressCallback {
     /**
@@ -8,9 +8,9 @@ interface IProgressCallback {
      *
      * @param task
      */
-    fun onConnecting(task: Task?)
+    fun onConnecting(task: Task)
 
-    fun onProgress(task: Task?)
+    fun onProgress(task: Task, complete:Boolean)
 
-    fun onFail(error: String?, task: Task?)
+    fun onFail(error: String?, task: Task)
 }
