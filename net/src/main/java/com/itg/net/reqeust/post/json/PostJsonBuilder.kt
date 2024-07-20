@@ -23,12 +23,10 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
     private val params = StringBuilder()
     private var jsonObject = JSONObject()
 
-    internal fun addJson1(json: String?): PostJsonBuilder {
-        val formParams = UrlTools.cutOffStrToMap(params.toString())
-        if (formParams.isNullOrEmpty()) return this
-        formParams.forEach { entry ->
-            if (!TextUtils.isEmpty(entry.key)) {
-                this.jsonObject.put(entry.key, entry.value)
+    internal fun addJson(key: String?,value:Any?): PostJsonBuilder {
+        if (!TextUtils.isEmpty(key)) {
+            if (key != null) {
+                this.jsonObject.put(key, value)
             }
         }
         return this

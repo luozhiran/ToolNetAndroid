@@ -96,8 +96,8 @@ abstract class PostMulBuilderImpl : ParamsBuilder(), PostBuilder, GetBuilder {
         return this
     }
 
-    override fun addJson(json: String?): PostMulBuilderImpl {
-        postJson.addJson1(json)
+    override fun addJson(key:String?,value:Any?): PostMulBuilderImpl {
+        postJson.addJson(key,value)
         return this
     }
 

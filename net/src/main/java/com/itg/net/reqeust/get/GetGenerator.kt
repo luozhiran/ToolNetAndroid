@@ -57,9 +57,11 @@ abstract class GetGenerator: ParamsBuilder(), SentBuilder, GetBuilder {
     internal fun getUrl(): String {
         val urlParamsMap = UrlTools.cutOffStrToMap(params.toString())
         val totalParamsMap = mutableMapOf<String,Any?>()
-        totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
-        urlParamsMap?.let {
-            totalParamsMap.putAll(it)
+        if (!this.noGlobalParams) {
+            totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
+            urlParamsMap?.let {
+                totalParamsMap.putAll(it)
+            }
         }
         return UrlTools.getSpliceUrl(totalParamsMap,this.url?:"")
     }

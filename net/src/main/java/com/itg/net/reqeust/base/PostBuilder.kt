@@ -11,5 +11,5 @@ interface PostBuilder : Builder {
     fun addFile(fileName: String?, mediaType: String?, file: File?): Builder
     fun addContent(content: String?, mediaType: String?): Builder
     fun addContent(content: String?, contentFlag: String?, mediaType: String?): Builder
-    fun addJson(content: String?): Builder
+    fun addJson(key:String?,value:Any?): Builder
 }

@@ -6,12 +6,6 @@ import com.itg.net.tools.UrlTools
 import okhttp3.Cookie
 
 abstract class PostJsonGenerator: PostJsonBuilder() {
-    private val urlParams = StringBuilder()
-    private val params = StringBuilder()
-    fun addJson(json:String?): PostJsonBuilder {
-        addJson1(json)
-        return this
-    }
 
 
 

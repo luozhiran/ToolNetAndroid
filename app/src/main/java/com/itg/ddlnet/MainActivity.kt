@@ -77,6 +77,7 @@ class MainActivity : AppCompatActivity() {
                 .url("http://www.baidu.com")
                 .addParam("key1", "a")
                 .addParam("key2", "b")
+                .noUseGlobalParams()
                 .autoCancel(this)
                 .send(object : DdCallback {
                     override fun onFailure(er: String?) {

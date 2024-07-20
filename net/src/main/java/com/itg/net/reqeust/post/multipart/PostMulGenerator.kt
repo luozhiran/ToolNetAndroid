@@ -81,8 +81,8 @@ abstract class PostMulGenerator : PostMulBuilderImpl() {
         return this
     }
 
-    override fun addJson(json: String?): PostMulBuilderImpl {
-        return super.addJson(json)
+    override fun addJson(key:String?,value:Any?): PostMulBuilderImpl {
+        return super.addJson(key,value)
     }
     override fun autoCancel(activity: Activity?): PostMulGenerator {
         return this

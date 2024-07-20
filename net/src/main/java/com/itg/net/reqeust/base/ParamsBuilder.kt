@@ -69,12 +69,12 @@ abstract class ParamsBuilder : Builder, SentBuilder {
         return this
     }
 
-    override fun path(path: String): Builder {
+    override fun path(path: String): ParamsBuilder {
         this.path = path
         return this
     }
 
-    override fun noUseGlobalParams(): Builder {
+    override fun noUseGlobalParams(): ParamsBuilder {
         this.noGlobalParams = true
         return this
     }
