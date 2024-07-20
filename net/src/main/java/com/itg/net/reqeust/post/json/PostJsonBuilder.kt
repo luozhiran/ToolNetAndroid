@@ -33,6 +33,13 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
     }
 
     protected fun getRequestBody(): RequestBody {
+        if (!this.noGlobalParams) {
+            Net.instance.ddNetConfig.globalParams.forEach{
+                if (!TextUtils.isEmpty(it.key)) {
+                    jsonObject.put(it.key,it.value)
+                }
+            }
+        }
         return jsonObject.toString().toRequestBody("application/json;charset=utf-8".toMediaType());
     }
 
@@ -96,15 +103,8 @@ abstract class PostJsonBuilder : ParamsBuilder(), GetBuilder {
     }
 
     internal fun getUrl(): String {
-        val urlParamsMap = UrlTools.cutOffStrToMap(urlParams.toString())
-        val totalParamsMap = mutableMapOf<String, Any?>()
-        if (!this.noGlobalParams) {
-            totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
-            urlParamsMap?.let {
-                totalParamsMap.putAll(it)
-            }
-        }
-        return UrlTools.getSpliceUrl(totalParamsMap, this.url ?: "")
+
+        return UrlTools.getSpliceUrl(null, this.url ?: "")
     }
 
     override fun addHeader(key: String?, value: String?): PostJsonBuilder {

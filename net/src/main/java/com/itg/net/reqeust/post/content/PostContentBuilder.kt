@@ -59,15 +59,15 @@ abstract class PostContentBuilder : ParamsBuilder() {
 
 
     internal fun getUrl(): String {
-        val urlParamsMap = UrlTools.cutOffStrToMap(urlParams.toString())
-        val totalParamsMap = mutableMapOf<String,Any?>()
-        if (!this.noGlobalParams) {
-            totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
-            urlParamsMap?.let {
-                totalParamsMap.putAll(it)
-            }
-        }
-        return UrlTools.getSpliceUrl(totalParamsMap,this.url?:"")
+//        val urlParamsMap = UrlTools.cutOffStrToMap(urlParams.toString())
+//        val totalParamsMap = mutableMapOf<String,Any?>()
+//        if (!this.noGlobalParams) {
+//            totalParamsMap.putAll(Net.instance.ddNetConfig.globalParams)
+//            urlParamsMap?.let {
+//                totalParamsMap.putAll(it)
+//            }
+//        }
+        return UrlTools.getSpliceUrl(null,this.url?:"")
     }
 
     override fun autoCancel(activity: Activity?): PostContentBuilder = this
