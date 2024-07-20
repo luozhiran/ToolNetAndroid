@@ -1,6 +1,7 @@
 package com.itg.net.reqeust.post.content
 
 import android.app.Activity
+import com.itg.net.reqeust.post.form.PostFormBuilder
 import okhttp3.Cookie
 
 abstract class PostContentGenerator : PostContentBuilder() {
@@ -48,4 +49,10 @@ abstract class PostContentGenerator : PostContentBuilder() {
         super.addTag(tag)
         return this
     }
+
+    override fun path(path: String): PostContentGenerator {
+        super.path(path)
+        return this
+    }
+
 }

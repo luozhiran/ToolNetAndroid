@@ -2,6 +2,7 @@ package com.itg.net.reqeust.post.multipart
 
 import android.app.Activity
 import com.itg.net.reqeust.get.GetBuilder
+import com.itg.net.reqeust.post.json.PostJsonGenerator
 import okhttp3.Cookie
 import java.io.File
 
@@ -83,6 +84,11 @@ abstract class PostMulGenerator : PostMulBuilderImpl() {
         return super.addJson(json)
     }
     override fun autoCancel(activity: Activity?): PostMulGenerator {
+        return this
+    }
+
+    override fun path(path: String): PostMulGenerator {
+        super.path(path)
         return this
     }
 }

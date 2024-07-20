@@ -4,6 +4,7 @@ import android.app.Activity
 import com.itg.net.Net
 import com.itg.net.reqeust.base.ParamsBuilder
 import com.itg.net.reqeust.base.SentBuilder
+import com.itg.net.reqeust.post.content.PostContentGenerator
 import com.itg.net.tools.UrlTools
 import okhttp3.Cookie
 
@@ -68,5 +69,9 @@ abstract class GetGenerator: ParamsBuilder(), SentBuilder, GetBuilder {
         return this
     }
 
+    override fun path(path: String): GetGenerator {
+        super.path(path)
+        return this
+    }
 
 }

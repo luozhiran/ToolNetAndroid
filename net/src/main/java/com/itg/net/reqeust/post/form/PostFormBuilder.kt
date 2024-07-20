@@ -2,6 +2,7 @@ package com.itg.net.reqeust.post.form
 
 import android.app.Activity
 import com.itg.net.Net
+import com.itg.net.reqeust.base.Builder
 import com.itg.net.reqeust.get.GetBuilder
 import com.itg.net.reqeust.base.ParamsBuilder
 import com.itg.net.tools.UrlTools
@@ -85,6 +86,11 @@ abstract class PostFormBuilder : ParamsBuilder(), GetBuilder {
 
     override fun addTag(tag: String?): PostFormBuilder {
         super.addTag(tag)
+        return this
+    }
+
+    override fun path(path: String): PostFormBuilder {
+         super.path(path)
         return this
     }
 

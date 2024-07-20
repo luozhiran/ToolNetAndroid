@@ -1,14 +1,19 @@
 package com.itg.net.reqeust.post.json
 
 import android.app.Activity
+import com.itg.net.reqeust.post.form.PostFormBuilder
+import com.itg.net.tools.UrlTools
 import okhttp3.Cookie
 
 abstract class PostJsonGenerator: PostJsonBuilder() {
-
+    private val urlParams = StringBuilder()
+    private val params = StringBuilder()
     fun addJson(json:String?): PostJsonBuilder {
         addJson1(json)
         return this
     }
+
+
 
     override fun autoCancel(activity: Activity?): PostJsonGenerator {
         return this
@@ -41,6 +46,11 @@ abstract class PostJsonGenerator: PostJsonBuilder() {
 
     override fun addTag(tag: String?): PostJsonGenerator {
         super.addTag(tag)
+        return this
+    }
+
+    override fun path(path: String): PostJsonGenerator {
+        super.path(path)
         return this
     }
 }

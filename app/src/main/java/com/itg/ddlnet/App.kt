@@ -14,6 +14,6 @@ class App:Application() {
             .setGlobalParams("43","af")
             .maxDownloadNum(1)
             .useHttpLog(true)
-            .url("https://www.baidu.com")
+            .url("http://47.76.59.147:8000/")
     }
 }

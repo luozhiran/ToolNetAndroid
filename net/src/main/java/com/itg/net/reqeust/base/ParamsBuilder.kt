@@ -1,6 +1,7 @@
 package com.itg.net.reqeust.base
 
 import android.app.Activity
+import android.text.TextUtils
 import com.itg.net.Net
 import com.itg.net.tools.StrTools
 import com.itg.net.tools.UrlTools
@@ -19,9 +20,21 @@ import org.json.JSONObject
  */
 abstract class ParamsBuilder : Builder, SentBuilder {
     var url: String? = Net.instance.ddNetConfig.url
+        get() {
+            return if (TextUtils.isEmpty(this.path)) {
+                field
+            } else {
+                if (field?.endsWith("/") == true) {
+                    field + this.path
+                } else {
+                    field +'/'+this.path
+                }
+            }
+        }
     private val headerStringBuilder = StringBuilder()
     var cookies: String? = null
     var tag: String? = null
+    var path:String?=null
 
     override fun addHeader(key: String?, value: String?): ParamsBuilder {
         if (key.isNullOrBlank() || value.isNullOrBlank()) return this
@@ -51,6 +64,11 @@ abstract class ParamsBuilder : Builder, SentBuilder {
 
     override fun addTag(tag: String?): ParamsBuilder {
         this.tag = tag
+        return this
+    }
+
+    override fun path(path: String): Builder {
+        this.path = path
         return this
     }
 

@@ -2,6 +2,7 @@ package com.itg.net.reqeust.post.file
 
 import android.app.Activity
 import com.itg.net.reqeust.base.ParamsBuilder
+import com.itg.net.reqeust.post.content.PostContentGenerator
 import okhttp3.Cookie
 import java.io.File
 
@@ -56,4 +57,9 @@ abstract class PostFileGenerator : PostFileBuilder() {
          super.addTag(tag)
         return this
     }
+    override fun path(path: String): ParamsBuilder {
+        super.path(path)
+        return this
+    }
+
 }

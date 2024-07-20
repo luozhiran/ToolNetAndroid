@@ -1,17 +1,20 @@
 package com.itg.ddlnet
 
 import android.annotation.SuppressLint
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
-import com.itg.net.Net
+import androidx.appcompat.app.AppCompatActivity
 import com.itg.net.Download
-import com.itg.net.MEDIA_JSON
-import com.itg.net.reqeust.base.DdCallback
+import com.itg.net.Net
 import com.itg.net.download.data.Task
 import com.itg.net.download.interfaces.IProgressCallback
+import com.itg.net.reqeust.base.DdCallback
 import java.io.File
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+import java.util.Date
+
 
 class MainActivity : AppCompatActivity() {
     var stop = true
@@ -89,17 +92,22 @@ class MainActivity : AppCompatActivity() {
         }
 
         findViewById<Button>(R.id.post).setOnClickListener {
-            Net.instance.postContent()
-                .url("https://www.baidu.com")
-                .addContent("fadsf", MEDIA_JSON)
+            val num = Date().time
+            Net.instance.postJson()
+//                .url("https://www.baidu.com")
+                .path("login")
+                .addParam("loginname","18516607913")
+                .addParam("nonce",num)
+                .addParam("pwd",md5("123456${num}"))
+                .noUseUrlCommonParams()
                 .autoCancel(this)
                 .send(object : DdCallback {
                     override fun onFailure(er: String?) {
-
+                        Log.e("luozhiran",er+"")
                     }
 
                     override fun onResponse(result: String?, code: Int) {
-
+                        Log.e("luozhiran",result+"")
                     }
 
                 })
@@ -113,4 +121,20 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         Download.instance.remoteGlobalProgressListener(progress)
     }
+
+
+    /** md5加密 */
+    fun md5(content: String): String {
+        val hash = MessageDigest.getInstance("MD5").digest(content.toByteArray())
+        val hex = StringBuilder(hash.size * 2)
+        for (b in hash) {
+            var str = Integer.toHexString(b.toInt())
+            if (b < 0x10) {
+                str = "0$str"
+            }
+            hex.append(str.substring(str.length -2))
+        }
+        return hex.toString()
+    }
+
 }
